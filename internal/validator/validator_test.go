@@ -1,25 +1,27 @@
 package validator_test
 
 import (
-	"curation-pipeline/internal/model"
 	"curation-pipeline/internal/validator"
 	"fmt"
-	"io/ioutil"
+	"github.com/pkg/errors"
+	"log"
+	"os"
 	"testing"
 )
 
 func TestValidate(t *testing.T) {
-	checklist := model.Checklist{
-		Name: "NCBI Schema",
-		URL:  "res/schema/ncbi-schema.json",
+	data, err := os.Open("./res/json/ncbi-SAMN03894263.json")
+	if err != nil {
+		log.Fatal(errors.Wrap(err, "read failed"))
 	}
 
-	b, err := ioutil.ReadFile("./res/json/ncbi-SAMN03894263.json")
+	checklist, err := os.Open("./res/schemas/ncbi-schema.json")
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(errors.Wrap(err, "read failed"))
 	}
-	str := string(b)
+
 	validator := validator.Validator{}
 
-	validator.Validate(checklist, str)
+	result, _ := validator.Validate(checklist, data)
+	fmt.Println(result)
 }
