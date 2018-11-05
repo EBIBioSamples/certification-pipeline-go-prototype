@@ -1,0 +1,32 @@
+language: go
+
+go:
+- 1.11.x
+- tip
+
+before_install:
+- chmod +x ./scripts/test.sh
+
+install:
+- go get github.com/golang/lint/golint
+
+matrix:
+  allow_failures:
+  - go: tip
+  fast_finish: true
+
+before_script:
+- PKGS=$(go list ./...)
+- LINT_PKGS=$(go list ./...)
+
+script:
+#- diff -u <(echo -n) <(gofmt -d $($LINT_PKGS))                  # Fail if a .go file hasn't been formatted with gofmt
+- ./scripts/test.sh                                              # Run all tests with coverage
+- go vet -v ./...                                                # static analyisis
+- golint $LINT_PKGS                                              # lint - ignore failures for now
+
+after_success:
+- bash <(curl -s https://codecov.io/bash)
+
+notifications:
+  slack: ebispot:DcHSOumOIyoD1Icc8WVDZe7U
