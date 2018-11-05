@@ -3,6 +3,7 @@ package creator_test
 import (
 	"fmt"
 	"github.com/EBIBioSamples/curation-pipeline/internal/creator"
+	"github.com/EBIBioSamples/curation-pipeline/internal/model"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
@@ -11,7 +12,19 @@ import (
 	"testing"
 )
 
+var (
+	sampleCreated = make(chan model.Sample)
+)
+
 func TestCreateSample(t *testing.T) {
+	go func(sampleCreated chan model.Sample) {
+		for {
+			select {
+			case sample := <-sampleCreated:
+				fmt.Printf("sample created: %s\n", sample.UUID)
+			}
+		}
+	}(sampleCreated)
 	tests := []struct {
 		documentFile string
 	}{
@@ -25,9 +38,9 @@ func TestCreateSample(t *testing.T) {
 			log.Fatal(errors.Wrap(err, fmt.Sprintf("read failed for: %s", test.documentFile)))
 		}
 
-		c := creator.Creator{
-			Logger: log.New(os.Stdout, "TestCreateSample ", log.LstdFlags|log.Lshortfile),
-		}
+		c := creator.NewCreator(
+			log.New(os.Stdout, "TestCreateSample ", log.LstdFlags|log.Lshortfile),
+			sampleCreated)
 		sample := c.CreateSample(string(document))
 		assert.Regexp(t, `[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`, sample.UUID)
 	}

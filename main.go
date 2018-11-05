@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"github.com/EBIBioSamples/curation-pipeline/internal/creator"
 	"github.com/EBIBioSamples/curation-pipeline/internal/interrogator"
+	"github.com/EBIBioSamples/curation-pipeline/internal/model"
+	"github.com/EBIBioSamples/curation-pipeline/internal/validator"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -15,20 +17,20 @@ import (
 var (
 	logger             = log.New(os.Stdout, "Curation Pipeline ", log.LstdFlags|log.Lshortfile)
 	serverPort         = os.Getenv("SERVER_PORT")
-	sampleCreated      = make(chan string)
+	sampleCreated      = make(chan model.Sample)
 	sampleInterrogated = make(chan string)
 	checklists         = map[string]string{
 		"NCBI Checklist":       "./res/schemas/ncbi-schema.json",
 		"BioSamples Checklist": "./res/schemas/biosamples-schema.json",
 	}
-	c = creator.Creator{
-		Logger: logger,
-	}
-	i = interrogator.Interrogator{
-		Logger:        logger,
-		SampleCreated: sampleCreated,
-		Checklists:    checklists,
-	}
+	c = creator.NewCreator(logger, sampleCreated)
+	i = interrogator.NewInterrogator(
+		logger,
+		&validator.Validator{},
+		sampleCreated,
+		sampleInterrogated,
+		checklists,
+	)
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +38,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	buf.ReadFrom(r.Body)
 	sample := c.CreateSample(buf.String())
 	w.Header().Set("content-type", "application/json")
-	json.NewEncoder(w).Encode(sample)
+	json.NewEncoder(w).Encode(sample.UUID)
 }
 
 func init() {

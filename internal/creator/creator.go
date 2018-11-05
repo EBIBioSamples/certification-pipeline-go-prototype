@@ -7,7 +7,8 @@ import (
 )
 
 type Creator struct {
-	Logger *log.Logger
+	logger        *log.Logger
+	sampleCreated chan model.Sample
 }
 
 func (c *Creator) CreateSample(json string) *model.Sample {
@@ -15,6 +16,15 @@ func (c *Creator) CreateSample(json string) *model.Sample {
 		UUID:     uuid.Must(uuid.NewUUID()).String(),
 		Document: json,
 	}
-	c.Logger.Printf("created new sample: %s", sample.UUID)
+	c.logger.Printf("created new sample: %s", sample.UUID)
+	c.sampleCreated <- sample
 	return &sample
+}
+
+func NewCreator(logger *log.Logger, sampleCreated chan model.Sample) *Creator {
+	c := Creator{
+		logger:        logger,
+		sampleCreated: sampleCreated,
+	}
+	return &c
 }
