@@ -1,8 +1,8 @@
 package validator_test
 
 import (
-	"curation-pipeline/internal/validator"
 	"fmt"
+	"github.com/EBIBioSamples/curation-pipeline/internal/validator"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"

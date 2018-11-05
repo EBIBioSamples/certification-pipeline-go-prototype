@@ -1,7 +1,7 @@
 package validator
 
 import (
-	"curation-pipeline/internal/model"
+	"github.com/EBIBioSamples/curation-pipeline/internal/model"
 	"github.com/xeipuuv/gojsonschema"
 )
 

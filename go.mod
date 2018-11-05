@@ -1,4 +1,4 @@
-module curation-pipeline
+module github.com/EBIBioSamples/curation-pipeline
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
