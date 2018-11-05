@@ -6,3 +6,9 @@ type ValidationResult struct {
 	Message string   `json:"message"`
 	Errors  []string `json:"errors"`
 }
+
+//Sample tracks samples JSON in the pipleline
+type Sample struct {
+	UUID     string
+	Document string
+}

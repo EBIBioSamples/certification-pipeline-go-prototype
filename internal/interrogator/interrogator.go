@@ -10,10 +10,11 @@ import (
 
 //Interrogator controls the workflow of the pipeline
 type Interrogator struct {
-	Logger        *log.Logger
-	Validator     *validator.Validator
-	SampleCreated chan string
-	Checklists    map[string]string
+	Logger             *log.Logger
+	Validator          *validator.Validator
+	SampleCreated      chan string
+	SampleInterrogated chan string
+	Checklists         map[string]string
 }
 
 func (i *Interrogator) handleEvents(sampleCreated chan string) {

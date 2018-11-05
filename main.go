@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/EBIBioSamples/curation-pipeline/internal/creator"
 	"github.com/EBIBioSamples/curation-pipeline/internal/interrogator"
 	"github.com/gorilla/mux"
 	"log"
@@ -12,14 +13,19 @@ import (
 )
 
 var (
-	serverPort    = os.Getenv("SERVER_PORT")
-	sampleCreated = make(chan string)
-	checklists    = map[string]string{
+	logger             = log.New(os.Stdout, "Curation Pipeline ", log.LstdFlags|log.Lshortfile)
+	serverPort         = os.Getenv("SERVER_PORT")
+	sampleCreated      = make(chan string)
+	sampleInterrogated = make(chan string)
+	checklists         = map[string]string{
 		"NCBI Checklist":       "./res/schemas/ncbi-schema.json",
 		"BioSamples Checklist": "./res/schemas/biosamples-schema.json",
 	}
+	c = creator.Creator{
+		Logger: logger,
+	}
 	i = interrogator.Interrogator{
-		Logger:        log.New(os.Stdout, "Curation Pipeline ", log.LstdFlags|log.Lshortfile),
+		Logger:        logger,
 		SampleCreated: sampleCreated,
 		Checklists:    checklists,
 	}
@@ -28,9 +34,9 @@ var (
 func handler(w http.ResponseWriter, r *http.Request) {
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(r.Body)
-	result := i.Interrogate(buf.String())
+	sample := c.CreateSample(buf.String())
 	w.Header().Set("content-type", "application/json")
-	json.NewEncoder(w).Encode(result)
+	json.NewEncoder(w).Encode(sample)
 }
 
 func init() {
@@ -40,10 +46,10 @@ func init() {
 }
 
 func main() {
-	i.Logger.Printf("starting curation pipeline service")
+	logger.Printf("starting curation pipeline service")
 	r := mux.NewRouter()
 	r.Handle("/", http.FileServer(http.Dir("./static")))
 	r.HandleFunc("/interrogate", handler).Methods("POST")
-	i.Logger.Printf("server starting on port %s", serverPort)
-	i.Logger.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", serverPort), r))
+	logger.Printf("server starting on port %s", serverPort)
+	logger.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", serverPort), r))
 }
