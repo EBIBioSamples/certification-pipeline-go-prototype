@@ -1,4 +1,4 @@
-package coordinator
+package interrogator
 
 import (
 	"fmt"
@@ -8,33 +8,34 @@ import (
 	"log"
 )
 
-//Coordinator controls the workflow of the pipeline
-type Coordinator struct {
+//Interrogator controls the workflow of the pipeline
+type Interrogator struct {
 	Logger        *log.Logger
 	Validator     *validator.Validator
 	SampleCreated chan string
 	Checklists    map[string]string
 }
 
-func (c *Coordinator) handleEvents(sampleCreated chan string) {
+func (i *Interrogator) handleEvents(sampleCreated chan string) {
 	go func() {
 		for {
 			select {
 			case s := <-sampleCreated:
-				c.FindCandidates(s)
+				i.Interrogate(s)
 			}
 		}
 	}()
 }
 
-func (c *Coordinator) FindCandidates(sample string) []string {
+//Interrogate a given sample to find out which checklists it complies to
+func (i *Interrogator) Interrogate(sample string) []string {
 	var candidates = make([]string, 0)
-	for key, checklist := range c.Checklists {
+	for key, checklist := range i.Checklists {
 		schema, err := ioutil.ReadFile(checklist)
 		if err != nil {
 			log.Fatal(errors.Wrap(err, fmt.Sprintf("read failed for: %s", checklist)))
 		}
-		vr, err := c.Validator.Validate(string(schema), sample)
+		vr, err := i.Validator.Validate(string(schema), sample)
 		if err != nil {
 			log.Fatal(errors.Wrap(err, fmt.Sprintf("failed to validate")))
 		}

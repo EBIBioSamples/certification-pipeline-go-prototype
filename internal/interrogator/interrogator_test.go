@@ -1,8 +1,8 @@
-package coordinator_test
+package interrogator_test
 
 import (
 	"fmt"
-	"github.com/EBIBioSamples/curation-pipeline/internal/coordinator"
+	"github.com/EBIBioSamples/curation-pipeline/internal/interrogator"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
@@ -19,7 +19,7 @@ var (
 	}
 )
 
-func TestFindCandidates(t *testing.T) {
+func TestInterrogate(t *testing.T) {
 	tests := []struct {
 		documentFile       string
 		expectedCandidates []string
@@ -35,12 +35,12 @@ func TestFindCandidates(t *testing.T) {
 			log.Fatal(errors.Wrap(err, fmt.Sprintf("read failed for: %s", test.documentFile)))
 		}
 
-		c := coordinator.Coordinator{
-			Logger:        log.New(os.Stdout, "TestFindCandidates ", log.LstdFlags|log.Lshortfile),
+		i := interrogator.Interrogator{
+			Logger:        log.New(os.Stdout, "TestInterrogate ", log.LstdFlags|log.Lshortfile),
 			SampleCreated: sampleCreated,
 			Checklists:    checklists,
 		}
-		candidates := c.FindCandidates(string(document))
+		candidates := i.Interrogate(string(document))
 		assert.Equal(t, test.expectedCandidates, candidates)
 	}
 }
