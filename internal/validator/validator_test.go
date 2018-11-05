@@ -11,7 +11,6 @@ import (
 )
 
 func TestValidate(t *testing.T) {
-
 	tests := []struct {
 		documentFile string
 		schemaFile   string
@@ -52,6 +51,5 @@ func TestValidate(t *testing.T) {
 		assert.Equal(t, test.valid, vr.Valid)
 		assert.Equal(t, test.err, err)
 		assert.Equal(t, test.errors, vr.Errors)
-
 	}
 }
