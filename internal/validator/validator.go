@@ -2,15 +2,14 @@ package validator
 
 import (
 	"github.com/xeipuuv/gojsonschema"
-	"io"
 )
 
 type Validator struct {
 }
 
-func (v *Validator) Validate(c io.Reader, d io.Reader) (string, error) {
-	schemaLoader, _ := gojsonschema.NewReaderLoader(c)
-	documentLoader, _ := gojsonschema.NewReaderLoader(d)
+func (v *Validator) Validate(schema string, document string) (string, error) {
+	schemaLoader := gojsonschema.NewStringLoader(schema)
+	documentLoader := gojsonschema.NewStringLoader(document)
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
 	if err != nil {
 		return err.Error(), err
@@ -26,6 +25,5 @@ func (v *Validator) Validate(c io.Reader, d io.Reader) (string, error) {
 			validationErrors = append(validationErrors, desc.Description())
 		}
 	}
-	fmt.println
 	return message, nil
 }

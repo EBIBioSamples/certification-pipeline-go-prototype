@@ -4,24 +4,39 @@ import (
 	"curation-pipeline/internal/validator"
 	"fmt"
 	"github.com/pkg/errors"
+	"io/ioutil"
 	"log"
-	"os"
 	"testing"
 )
 
 func TestValidate(t *testing.T) {
-	data, err := os.Open("./res/json/ncbi-SAMN03894263.json")
-	if err != nil {
-		log.Fatal(errors.Wrap(err, "read failed"))
+
+	tests := []struct {
+		documentFile string
+		schemaFile   string
+		result       string
+		err          error
+	}{
+		{
+			documentFile: "../../res/json/ncbi-SAMN03894263.json",
+			schemaFile:   "../../res/schemas/ncbi-schema.json",
+			err:          nil,
+		}}
+
+	for _, test := range tests {
+		document, err := ioutil.ReadFile(test.documentFile)
+		if err != nil {
+			log.Fatal(errors.Wrap(err, fmt.Sprintf("read failed for: %s", test.documentFile)))
+		}
+
+		schema, err := ioutil.ReadFile(test.schemaFile)
+		if err != nil {
+			log.Fatal(errors.Wrap(err, fmt.Sprintf("read failed for: %s", test.schemaFile)))
+		}
+
+		validator := validator.Validator{}
+
+		result, _ := validator.Validate(string(schema), string(document))
+		fmt.Println(result)
 	}
-
-	checklist, err := os.Open("./res/schemas/ncbi-schema.json")
-	if err != nil {
-		log.Fatal(errors.Wrap(err, "read failed"))
-	}
-
-	validator := validator.Validator{}
-
-	result, _ := validator.Validate(checklist, data)
-	fmt.Println(result)
 }
