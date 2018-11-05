@@ -1,18 +1,19 @@
 package validator
 
 import (
+	"curation-pipeline/internal/model"
 	"github.com/xeipuuv/gojsonschema"
 )
 
 type Validator struct {
 }
 
-func (v *Validator) Validate(schema string, document string) (string, error) {
+func (v *Validator) Validate(schema string, document string) (model.ValidationResult, error) {
 	schemaLoader := gojsonschema.NewStringLoader(schema)
 	documentLoader := gojsonschema.NewStringLoader(document)
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
 	if err != nil {
-		return err.Error(), err
+		return model.ValidationResult{}, err
 	}
 
 	var message string
@@ -25,5 +26,12 @@ func (v *Validator) Validate(schema string, document string) (string, error) {
 			validationErrors = append(validationErrors, desc.Description())
 		}
 	}
-	return message, nil
+
+	vr := model.ValidationResult{
+		Valid:   result.Valid(),
+		Message: message,
+		Errors:  validationErrors,
+	}
+
+	return vr, nil
 }
