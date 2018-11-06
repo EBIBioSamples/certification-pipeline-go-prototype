@@ -24,3 +24,20 @@ type InterrogationResult struct {
 	Sample              Sample
 	CandidateChecklists []Checklist
 }
+
+//CurationPlan is a series of curations to attempt to take a sample complying to one checklist to another
+type CurationPlan struct {
+	FromChecklist Checklist
+	ToChecklist   Checklist
+	Curations     []Curation
+}
+
+//Curation is a transformation of a sample document content
+type Curation struct {
+}
+
+//CurationPlanResult is the result of executing a curation plan
+type CurationPlanResult struct {
+	CurationPlan CurationPlan
+	Sample       Sample
+}
