@@ -20,7 +20,7 @@ func TestValidate(t *testing.T) {
 	}{
 		{
 			documentFile: "../../res/json/ncbi-SAMN03894263.json",
-			schemaFile:   "../../res/schemas/ncbi-schema.json",
+			schemaFile:   "../../res/schemas/ncbi-candidate-schema.json",
 			valid:        true,
 			err:          nil,
 		},

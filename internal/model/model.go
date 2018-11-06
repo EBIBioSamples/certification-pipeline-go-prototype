@@ -7,8 +7,20 @@ type ValidationResult struct {
 	Errors  []string `json:"errors"`
 }
 
-//Sample tracks samples JSON in the pipleline
+//Checklist contains the name and file of a checklist
+type Checklist struct {
+	Name string
+	File string
+}
+
+//Sample tracks samples JSON in the pipeline
 type Sample struct {
 	UUID     string
 	Document string
+}
+
+//InterrogationResult contains the checklists sample is a candidate for
+type InterrogationResult struct {
+	Sample              Sample
+	CandidateChecklists []Checklist
 }

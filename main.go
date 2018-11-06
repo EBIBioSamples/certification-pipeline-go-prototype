@@ -18,10 +18,10 @@ var (
 	logger             = log.New(os.Stdout, "Curation Pipeline ", log.LstdFlags|log.Lshortfile)
 	serverPort         = os.Getenv("SERVER_PORT")
 	sampleCreated      = make(chan model.Sample)
-	sampleInterrogated = make(chan string)
-	checklists         = map[string]string{
-		"NCBI Checklist":       "./res/schemas/ncbi-schema.json",
-		"BioSamples Checklist": "./res/schemas/biosamples-schema.json",
+	sampleInterrogated = make(chan model.InterrogationResult)
+	checklists         = []model.Checklist{
+		{Name: "NCBI Candidate Checklist", File: "../../res/schemas/ncbi-candidate-schema.json"},
+		{Name: "BioSamples Checklist", File: "../../res/schemas/biosamples-schema.json"},
 	}
 	c = creator.NewCreator(logger, sampleCreated)
 	i = interrogator.NewInterrogator(

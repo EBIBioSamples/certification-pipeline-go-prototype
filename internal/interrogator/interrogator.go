@@ -9,32 +9,21 @@ import (
 	"log"
 )
 
-//Interrogator controls the workflow of the pipeline
+//Interrogator checks samples against checklists to find candidate samples for curation
 type Interrogator struct {
 	logger             *log.Logger
 	validator          *validator.Validator
 	sampleCreated      chan model.Sample
-	sampleInterrogated chan string
-	checklists         map[string]string
-}
-
-func (i *Interrogator) handleEvents(sampleCreated chan model.Sample) {
-	go func() {
-		for {
-			select {
-			case s := <-sampleCreated:
-				i.Interrogate(s)
-			}
-		}
-	}()
+	sampleInterrogated chan model.InterrogationResult
+	checklistMap       map[string]model.Checklist
 }
 
 //Interrogate a given sample to find out which checklists it complies to
-func (i *Interrogator) Interrogate(sample model.Sample) []string {
-	var candidates = make([]string, 0)
-	for key, checklist := range i.checklists {
+func (i *Interrogator) interrogate(sample model.Sample) {
+	var candidates = make([]model.Checklist, 0)
+	for key, checklist := range i.checklistMap {
 		i.logger.Printf("checking %s against %s\n", sample.UUID, key)
-		schema, err := ioutil.ReadFile(checklist)
+		schema, err := ioutil.ReadFile(checklist.File)
 		if err != nil {
 			i.logger.Fatal(errors.Wrap(err, fmt.Sprintf("read failed for: %s", checklist)))
 		}
@@ -43,25 +32,45 @@ func (i *Interrogator) Interrogate(sample model.Sample) []string {
 			i.logger.Fatal(errors.Wrap(err, fmt.Sprintf("failed to validate")))
 		}
 		if vr.Valid {
-			candidates = append(candidates, key)
+			candidates = append(candidates, checklist)
 		}
 	}
-	return candidates
+	ir := model.InterrogationResult{
+		Sample:              sample,
+		CandidateChecklists: candidates,
+	}
+	i.sampleInterrogated <- ir
 }
 
+//NewInterrogator returns a new instance of an Interrogate with the specified checklists
 func NewInterrogator(
 	logger *log.Logger,
 	validator *validator.Validator,
 	sampleCreated chan model.Sample,
-	sampleInterrogated chan string,
-	checklists map[string]string) *Interrogator {
+	sampleInterrogated chan model.InterrogationResult,
+	checklists []model.Checklist) *Interrogator {
+	checklistMap := make(map[string]model.Checklist)
+	for _, checklist := range checklists {
+		checklistMap[checklist.Name] = checklist
+	}
 	i := Interrogator{
 		logger:             logger,
 		validator:          validator,
 		sampleCreated:      sampleCreated,
 		sampleInterrogated: sampleInterrogated,
-		checklists:         checklists,
+		checklistMap:       checklistMap,
 	}
 	i.handleEvents(sampleCreated)
 	return &i
+}
+
+func (i *Interrogator) handleEvents(sampleCreated chan model.Sample) {
+	go func() {
+		for {
+			select {
+			case s := <-sampleCreated:
+				i.interrogate(s)
+			}
+		}
+	}()
 }

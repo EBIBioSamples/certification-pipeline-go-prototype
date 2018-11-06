@@ -15,21 +15,21 @@ import (
 
 var (
 	sampleCreated      = make(chan model.Sample)
-	sampleInterrogated = make(chan string)
-	checklists         = map[string]string{
-		"NCBI Checklist":       "../../res/schemas/ncbi-schema.json",
-		"BioSamples Checklist": "../../res/schemas/biosamples-schema.json",
+	sampleInterrogated = make(chan model.InterrogationResult)
+	checklists         = []model.Checklist{
+		{Name: "NCBI Candidate Checklist", File: "../../res/schemas/ncbi-candidate-schema.json"},
+		{Name: "BioSamples Checklist", File: "../../res/schemas/biosamples-schema.json"},
 	}
 )
 
 func TestInterrogate(t *testing.T) {
 	tests := []struct {
-		documentFile       string
-		expectedCandidates []string
+		documentFile           string
+		expectedCandidateNames []string
 	}{
 		{
-			documentFile:       "../../res/json/ncbi-SAMN03894263.json",
-			expectedCandidates: []string{"NCBI Checklist"},
+			documentFile:           "../../res/json/ncbi-SAMN03894263.json",
+			expectedCandidateNames: []string{"NCBI Candidate Checklist"},
 		},
 	}
 	for _, test := range tests {
@@ -38,14 +38,21 @@ func TestInterrogate(t *testing.T) {
 			log.Fatal(errors.Wrap(err, fmt.Sprintf("read failed for: %s", test.documentFile)))
 		}
 
-		i := interrogator.NewInterrogator(
+		interrogator.NewInterrogator(
 			log.New(os.Stdout, "TestInterrogate ", log.LstdFlags|log.Lshortfile),
 			&validator.Validator{},
 			sampleCreated,
 			sampleInterrogated,
 			checklists,
 		)
-		candidates := i.Interrogate(model.Sample{UUID: "test-uuid", Document: string(document)})
-		assert.Equal(t, test.expectedCandidates, candidates)
+
+		sample := model.Sample{UUID: "test-uuid", Document: string(document)}
+		sampleCreated <- sample
+		ir := <-sampleInterrogated
+		var candidateNames []string
+		for _, checklist := range ir.CandidateChecklists {
+			candidateNames = append(candidateNames, checklist.Name)
+		}
+		assert.Equal(t, test.expectedCandidateNames, candidateNames)
 	}
 }

@@ -6,11 +6,13 @@ import (
 	"log"
 )
 
+//Creator registers a samples document with the system to enable tracking
 type Creator struct {
 	logger        *log.Logger
 	sampleCreated chan model.Sample
 }
 
+//CreateSample assigns a UUID to a sample document to use for tracking
 func (c *Creator) CreateSample(json string) *model.Sample {
 	sample := model.Sample{
 		UUID:     uuid.Must(uuid.NewUUID()).String(),
@@ -21,6 +23,7 @@ func (c *Creator) CreateSample(json string) *model.Sample {
 	return &sample
 }
 
+//NewCreator returns a new instance of a creator with an output channel
 func NewCreator(logger *log.Logger, sampleCreated chan model.Sample) *Creator {
 	c := Creator{
 		logger:        logger,
