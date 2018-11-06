@@ -41,6 +41,24 @@ func init() {
 	if serverPort == "" {
 		log.Fatal("$SERVER_PORT not set")
 	}
+	checklistMap := make(map[string]model.Checklist)
+	for _, checklist := range checklists {
+		checklistMap[checklist.Name] = checklist
+	}
+	curationPlans = []model.CurationPlan{
+		{
+			Logger:        logger,
+			Name:          "NCBI to BioSamples",
+			FromChecklist: checklistMap["NCBI Candidate Checklist"],
+			ToChecklist:   checklistMap["BioSamples Checklist"],
+			Curations: []model.Curation{
+				{
+					Characteristic: "INSDC status",
+					NewValue:       "public",
+				},
+			},
+		},
+	}
 	interrogator.NewInterrogator(
 		logger,
 		&validator.Validator{},

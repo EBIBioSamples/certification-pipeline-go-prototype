@@ -12,6 +12,7 @@ import (
 )
 
 var (
+	logger                = log.New(os.Stdout, "TestCurate ", log.LstdFlags|log.Lshortfile)
 	sampleInterrogated    = make(chan model.InterrogationResult)
 	curationPlanCompleted = make(chan model.CurationPlanResult)
 	checklists            = []model.Checklist{
@@ -26,6 +27,20 @@ func init() {
 	for _, checklist := range checklists {
 		checklistMap[checklist.Name] = checklist
 	}
+	curationPlans = []model.CurationPlan{
+		{
+			Logger:        logger,
+			Name:          "NCBI to BioSamples",
+			FromChecklist: checklistMap["NCBI Candidate Checklist"],
+			ToChecklist:   checklistMap["BioSamples Checklist"],
+			Curations: []model.Curation{
+				{
+					Characteristic: "INSDC status",
+					NewValue:       "public",
+				},
+			},
+		},
+	}
 }
 
 func TestCurate(t *testing.T) {
@@ -38,7 +53,7 @@ func TestCurate(t *testing.T) {
 	}
 	for _, test := range tests {
 		curator.NewCurator(
-			log.New(os.Stdout, "TestCurate ", log.LstdFlags|log.Lshortfile),
+			logger,
 			sampleInterrogated,
 			curationPlanCompleted,
 			curationPlans,

@@ -18,18 +18,22 @@ func NewCurator(logger *log.Logger, sampleInterrogated chan model.InterrogationR
 	for _, cp := range curationPlans {
 		curationPlansByChecklist[cp.FromChecklist] = cp
 	}
-	c := Curator{
+	curator := Curator{
 		logger:                   logger,
 		sampleInterrogated:       sampleInterrogated,
 		curationPlanCompleted:    curationPlanCompleted,
 		curationPlansByChecklist: curationPlansByChecklist,
 	}
-	c.handleEvents(sampleInterrogated)
-	return &c
+	curator.handleEvents(sampleInterrogated)
+	return &curator
 }
 
 func (c *Curator) runCurationPlans(ir model.InterrogationResult) {
-	c.logger.Printf("at the point a curation plan would run for %s", ir.CandidateChecklists)
+	for _, cc := range ir.CandidateChecklists {
+		cp := c.curationPlansByChecklist[cc]
+		s := cp.Execute(ir.Sample)
+		c.logger.Printf("curated sample %s", s.UUID)
+	}
 }
 
 func (c *Curator) handleEvents(sampleInterrogated chan model.InterrogationResult) {

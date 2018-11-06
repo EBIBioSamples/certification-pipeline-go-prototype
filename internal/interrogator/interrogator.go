@@ -35,11 +35,14 @@ func (i *Interrogator) interrogate(sample model.Sample) {
 			candidates = append(candidates, checklist)
 		}
 	}
-	ir := model.InterrogationResult{
-		Sample:              sample,
-		CandidateChecklists: candidates,
+	if len(candidates) > 0 {
+		ir := model.InterrogationResult{
+			Sample:              sample,
+			CandidateChecklists: candidates,
+		}
+		i.logger.Printf("sample %s matches %s", sample.UUID, ir.CandidateChecklists)
+		i.sampleInterrogated <- ir
 	}
-	i.sampleInterrogated <- ir
 }
 
 //NewInterrogator returns a new instance of an Interrogate with the specified checklists
