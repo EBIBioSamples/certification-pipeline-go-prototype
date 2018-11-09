@@ -37,6 +37,9 @@ func (r *Reporter) handleEvents(certificateIssued chan model.Certificate) {
 	}()
 }
 
-func (r *Reporter) SampleInfo(uuid string) model.Certificate {
-	return r.certMap[uuid]
+func (r *Reporter) SampleInfo(uuid string) (cert model.Certificate, ok bool) {
+	r.RLock()
+	result, ok := r.certMap[uuid]
+	r.RUnlock()
+	return result, ok
 }

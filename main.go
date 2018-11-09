@@ -41,14 +41,19 @@ func interrogateHandler(w http.ResponseWriter, r *http.Request) {
 	buf.ReadFrom(r.Body)
 	sample := cr.CreateSample(buf.String())
 	w.Header().Set("content-type", "application/json")
-	json.NewEncoder(w).Encode(sample.UUID)
+	json.NewEncoder(w).Encode(fmt.Sprintf("http://%s/sample/%s", r.Host, sample.UUID))
 }
 
 func sampleHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uuid := vars["uuid"]
+	result, ok := rep.SampleInfo(uuid)
+	if !ok {
+		http.Error(w, "Sample not found", 404)
+		return
+	}
 	w.Header().Set("content-type", "application/json")
-	json.NewEncoder(w).Encode(rep.SampleInfo(uuid))
+	json.NewEncoder(w).Encode(result)
 }
 
 func init() {
