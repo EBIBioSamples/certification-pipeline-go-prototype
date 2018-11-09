@@ -9,6 +9,7 @@ import (
 	"github.com/EBIBioSamples/certification-pipeline/internal/curator"
 	"github.com/EBIBioSamples/certification-pipeline/internal/interrogator"
 	"github.com/EBIBioSamples/certification-pipeline/internal/model"
+	"github.com/EBIBioSamples/certification-pipeline/internal/reporter"
 	"github.com/EBIBioSamples/certification-pipeline/internal/validator"
 	"github.com/gorilla/mux"
 	"gopkg.in/Graylog2/go-gelf.v1/gelf"
@@ -32,14 +33,22 @@ var (
 	}
 	curationPlans []model.CurationPlan
 	cr            = creator.NewCreator(logger, sampleCreated)
+	rep           *reporter.Reporter
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
+func interrogateHandler(w http.ResponseWriter, r *http.Request) {
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(r.Body)
 	sample := cr.CreateSample(buf.String())
 	w.Header().Set("content-type", "application/json")
 	json.NewEncoder(w).Encode(sample.UUID)
+}
+
+func sampleHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	uuid := vars["uuid"]
+	w.Header().Set("content-type", "application/json")
+	json.NewEncoder(w).Encode(rep.SampleInfo(uuid))
 }
 
 func init() {
@@ -95,13 +104,18 @@ func init() {
 		certificateIssued,
 		checklists,
 	)
+	rep = reporter.NewReporter(
+		logger,
+		certificateIssued,
+	)
 }
 
 func main() {
 	logger.Printf("starting curation pipeline service")
 	r := mux.NewRouter()
 	r.Handle("/", http.FileServer(http.Dir("./static")))
-	r.HandleFunc("/interrogate", handler).Methods("POST")
+	r.HandleFunc("/interrogate", interrogateHandler).Methods("POST")
+	r.HandleFunc("/sample/{uuid}", sampleHandler).Methods("GET")
 	logger.Printf("server starting on port %s", serverPort)
 	logger.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", serverPort), r))
 }

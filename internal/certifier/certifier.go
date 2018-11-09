@@ -26,11 +26,11 @@ func (c *Certifier) certify(cpr model.CurationPlanResult) {
 		c.logger.Printf("validating %s against %s\n", cpr.Sample.UUID, checklist.Name)
 		schema, err := ioutil.ReadFile(checklist.File)
 		if err != nil {
-			c.logger.Fatal(errors.Wrap(err, fmt.Sprintf("read failed for: %s", checklist)))
+			c.logger.Panic(errors.Wrap(err, fmt.Sprintf("read failed for: %s", checklist)))
 		}
 		vr, err := c.validator.Validate(string(schema), cpr.Sample.Document)
 		if err != nil {
-			c.logger.Fatal(errors.Wrap(err, fmt.Sprintf("failed to validate")))
+			c.logger.Panic(errors.Wrap(err, fmt.Sprintf("failed to validate")))
 		}
 
 		if vr.Valid {

@@ -25,11 +25,11 @@ func (i *Interrogator) interrogate(sample model.Sample) {
 		i.logger.Printf("checking %s against %s\n", sample.UUID, key)
 		schema, err := ioutil.ReadFile(checklist.File)
 		if err != nil {
-			i.logger.Fatal(errors.Wrap(err, fmt.Sprintf("read failed for: %s", checklist)))
+			i.logger.Panic(errors.Wrap(err, fmt.Sprintf("read failed for: %s", checklist)))
 		}
 		vr, err := i.validator.Validate(string(schema), sample.Document)
 		if err != nil {
-			i.logger.Fatal(errors.Wrap(err, fmt.Sprintf("failed to validate")))
+			i.logger.Panic(errors.Wrap(err, fmt.Sprintf("failed to validate")))
 		}
 		if vr.Valid {
 			candidates = append(candidates, checklist)
