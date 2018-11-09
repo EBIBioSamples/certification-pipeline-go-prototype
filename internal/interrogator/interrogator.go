@@ -2,8 +2,8 @@ package interrogator
 
 import (
 	"fmt"
-	"github.com/EBIBioSamples/curation-pipeline/internal/model"
-	"github.com/EBIBioSamples/curation-pipeline/internal/validator"
+	"github.com/EBIBioSamples/certification-pipeline/internal/model"
+	"github.com/EBIBioSamples/certification-pipeline/internal/validator"
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"log"

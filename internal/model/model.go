@@ -36,3 +36,11 @@ type CurationPlanResult struct {
 	CurationPlan CurationPlan
 	Sample       Sample
 }
+
+//Certificate is certification given to a Sample against a Checklist
+type Certificate struct {
+	Sample        Sample
+	SampleHash    string
+	Checklist     Checklist
+	ChecklistHash string
+}

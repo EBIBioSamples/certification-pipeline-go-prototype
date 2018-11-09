@@ -2,7 +2,7 @@ package model_test
 
 import (
 	"fmt"
-	"github.com/EBIBioSamples/curation-pipeline/internal/model"
+	"github.com/EBIBioSamples/certification-pipeline/internal/model"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"

@@ -1,7 +1,7 @@
 package creator
 
 import (
-	"github.com/EBIBioSamples/curation-pipeline/internal/model"
+	"github.com/EBIBioSamples/certification-pipeline/internal/model"
 	"github.com/google/uuid"
 	"log"
 )

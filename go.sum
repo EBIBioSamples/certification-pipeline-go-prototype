@@ -6,8 +6,6 @@ github.com/gorilla/context v1.1.1 h1:AWwleXJkX/nhcU9bZSnZoi3h/qGYqQAGhq6zZe/aQW8
 github.com/gorilla/context v1.1.1/go.mod h1:kBGZzfjB9CEq2AlWe17Uuf7NDRt0dE0s8S51q0aT7Yg=
 github.com/gorilla/mux v1.6.2 h1:Pgr17XVTNXAk3q/r4CpKzC5xBM/qW1uVLV+IhRZpIIk=
 github.com/gorilla/mux v1.6.2/go.mod h1:1lud6UwP+6orDFRuTfBEV8e9/aOM/c4fVVCaMa2zaAs=
-github.com/mdaverde/jsonpath v0.0.0-20180315003411-f4ae4b6f36b5 h1:+J/mbR+mkR3z1XO500DIMAKIxVRGll9IW6c0rLgkrwI=
-github.com/mdaverde/jsonpath v0.0.0-20180315003411-f4ae4b6f36b5/go.mod h1:rs1SQV0LEG9i85G47J6dBtmCUd8j7wC3av/IFsfYV/k=
 github.com/pkg/errors v0.8.0 h1:WdK/asTD0HN+q6hsWO3/vpuAkAr+tw6aNJNDFFf0+qw=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
@@ -26,3 +24,5 @@ github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 h1:EzJWgHo
 github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415/go.mod h1:GwrjFmJcFw6At/Gs6z4yjiIwzuJ1/+UwLxMQDVQXShQ=
 github.com/xeipuuv/gojsonschema v0.0.0-20181016150526-f3a9dae5b194 h1:va8F6ctiwxAm980W2zwP4vfSFaKeYlqPo24rRvYjmdc=
 github.com/xeipuuv/gojsonschema v0.0.0-20181016150526-f3a9dae5b194/go.mod h1:5yf86TLmAcydyeJq5YvxkGPE2fm/u4myDekKRoLuqhs=
+gopkg.in/Graylog2/go-gelf.v1 v1.0.0-20170811154226-7ebf4f536d8f h1:Rle3NzY1O9cyXt1MHSERAzpbR8D4wTvO3vRsgBsr8WI=
+gopkg.in/Graylog2/go-gelf.v1 v1.0.0-20170811154226-7ebf4f536d8f/go.mod h1:m1PYiRvT4jG4oTm1H+OM5VC6sLyS+7aNCuI1qowlogM=

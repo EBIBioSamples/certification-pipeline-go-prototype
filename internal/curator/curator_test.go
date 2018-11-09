@@ -2,9 +2,10 @@ package curator_test
 
 import (
 	"fmt"
-	"github.com/EBIBioSamples/curation-pipeline/internal/curator"
-	"github.com/EBIBioSamples/curation-pipeline/internal/model"
+	"github.com/EBIBioSamples/certification-pipeline/internal/curator"
+	"github.com/EBIBioSamples/certification-pipeline/internal/model"
 	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"log"
 	"os"
@@ -15,6 +16,7 @@ var (
 	logger                = log.New(os.Stdout, "TestCurate ", log.LstdFlags|log.Lshortfile)
 	sampleInterrogated    = make(chan model.InterrogationResult)
 	curationPlanCompleted = make(chan model.CurationPlanResult)
+	certificateIssued     = make(chan model.Certificate)
 	checklists            = []model.Checklist{
 		{Name: "NCBI Candidate Checklist", File: "../../res/schemas/ncbi-candidate-schema.json"},
 		{Name: "BioSamples Checklist", File: "../../res/schemas/biosamples-schema.json"},
@@ -45,10 +47,12 @@ func init() {
 
 func TestCurate(t *testing.T) {
 	tests := []struct {
-		documentFile string
+		documentFile        string
+		curatedDocumentFile string
 	}{
 		{
-			documentFile: "../../res/json/ncbi-SAMN03894263.json",
+			documentFile:        "../../res/json/ncbi-SAMN03894263.json",
+			curatedDocumentFile: "../../res/json/ncbi-SAMN03894263-curated.json",
 		},
 	}
 	for _, test := range tests {
@@ -56,6 +60,7 @@ func TestCurate(t *testing.T) {
 			logger,
 			sampleInterrogated,
 			curationPlanCompleted,
+			certificateIssued,
 			curationPlans,
 		)
 		document, err := ioutil.ReadFile(test.documentFile)
@@ -67,5 +72,11 @@ func TestCurate(t *testing.T) {
 			Sample:              sample,
 			CandidateChecklists: []model.Checklist{checklistMap["NCBI Candidate Checklist"]},
 		}
+		cpr := <-curationPlanCompleted
+		curatedDocument, err := ioutil.ReadFile(test.curatedDocumentFile)
+		if err != nil {
+			log.Fatal(errors.Wrap(err, fmt.Sprintf("read failed for: %s", test.curatedDocumentFile)))
+		}
+		assert.Equal(t, string(curatedDocument), cpr.Sample.Document)
 	}
 }
