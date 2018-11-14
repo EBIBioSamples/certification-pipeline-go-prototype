@@ -22,14 +22,14 @@ var (
 		{Name: "BioSamples Checklist", File: "../../res/schemas/biosamples-schema.json"},
 	}
 	checklistMap  = make(map[string]model.Checklist)
-	curationPlans []model.CurationPlan
+	curationPlans []model.Plan
 )
 
 func init() {
 	for _, checklist := range checklists {
 		checklistMap[checklist.Name] = checklist
 	}
-	curationPlans = []model.CurationPlan{
+	curationPlans = []model.Plan{
 		{
 			Logger:        logger,
 			Name:          "NCBI to BioSamples",

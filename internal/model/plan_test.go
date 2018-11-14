@@ -12,10 +12,10 @@ import (
 )
 
 var (
-	logger = log.New(os.Stdout, "TestCurationPlan ", log.LstdFlags|log.Lshortfile)
+	logger = log.New(os.Stdout, "TestPlan ", log.LstdFlags|log.Lshortfile)
 )
 
-func TestCurationPlan(t *testing.T) {
+func TestPlan(t *testing.T) {
 	tests := []struct {
 		documentFile        string
 		curatedDocumentFile string
@@ -35,7 +35,7 @@ func TestCurationPlan(t *testing.T) {
 			log.Fatal(errors.Wrap(err, fmt.Sprintf("read failed for: %s", test.curatedDocumentFile)))
 		}
 
-		cp := model.CurationPlan{
+		cp := model.Plan{
 			Logger: logger,
 			Name:   "Test curation plan",
 			Curations: []model.Curation{

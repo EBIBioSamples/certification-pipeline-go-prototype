@@ -10,12 +10,12 @@ type Curator struct {
 	sampleInterrogated       chan model.InterrogationResult
 	curationPlanCompleted    chan model.CurationPlanResult
 	certificateIssued        chan model.Certificate
-	curationPlansByChecklist map[model.Checklist]model.CurationPlan
+	curationPlansByChecklist map[model.Checklist]model.Plan
 }
 
 func NewCurator(logger *log.Logger, sampleInterrogated chan model.InterrogationResult,
-	curationPlanCompleted chan model.CurationPlanResult, certificateIssued chan model.Certificate, curationPlans []model.CurationPlan) *Curator {
-	curationPlansByChecklist := make(map[model.Checklist]model.CurationPlan)
+	curationPlanCompleted chan model.CurationPlanResult, certificateIssued chan model.Certificate, curationPlans []model.Plan) *Curator {
+	curationPlansByChecklist := make(map[model.Checklist]model.Plan)
 	for _, cp := range curationPlans {
 		curationPlansByChecklist[cp.FromChecklist] = cp
 	}

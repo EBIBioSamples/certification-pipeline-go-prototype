@@ -31,7 +31,7 @@ var (
 		{Name: "NCBI Candidate Checklist", File: "./res/schemas/ncbi-candidate-schema.json"},
 		{Name: "BioSamples Checklist", File: "./res/schemas/biosamples-schema.json"},
 	}
-	curationPlans []model.CurationPlan
+	curationPlans []model.Plan
 	cr            = creator.NewCreator(logger, sampleCreated)
 	rep           *reporter.Reporter
 )
@@ -74,7 +74,7 @@ func init() {
 	for _, checklist := range checklists {
 		checklistMap[checklist.Name] = checklist
 	}
-	curationPlans = []model.CurationPlan{
+	curationPlans = []model.Plan{
 		{
 			Logger:        logger,
 			Name:          "NCBI to BioSamples",

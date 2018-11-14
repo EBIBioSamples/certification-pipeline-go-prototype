@@ -33,7 +33,7 @@ type Curation struct {
 
 //CurationPlanResult is the result of executing a curation plan
 type CurationPlanResult struct {
-	CurationPlan CurationPlan
+	CurationPlan Plan
 	Sample       Sample
 }
 
