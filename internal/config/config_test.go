@@ -10,12 +10,13 @@ import (
 )
 
 var (
-	logger     = log.New(os.Stdout, "TestLoader ", log.LstdFlags|log.Lshortfile)
-	configFile = "../../res/config.json"
+	logger = log.New(os.Stdout, "TestLoader ", log.LstdFlags|log.Lshortfile)
 )
 
-func TestConfig(t *testing.T) {
-	config := config.NewConfig(logger, configFile)
+func TestConfigWithValidFile(t *testing.T) {
+	validConfigFile := "../../res/config.json"
+	config, err := config.NewConfig(logger, validConfigFile, "../../res/schemas/config-schema.json")
+	assert.Nil(t, err)
 	assert.NotEmpty(t, config.Checklists)
 	for _, c := range config.Checklists {
 		assert.NotEmpty(t, c.Name)
@@ -29,4 +30,10 @@ func TestConfig(t *testing.T) {
 		assert.NotEmpty(t, p.Curations)
 		fmt.Println(p.Curations)
 	}
+}
+
+func TestConfigWithInvalidFile(t *testing.T) {
+	validConfigFile := "../../res/invalid_config.json"
+	_, err := config.NewConfig(logger, validConfigFile, "../../res/schemas/config-schema.json")
+	assert.NotNil(t, err)
 }

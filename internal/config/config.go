@@ -2,7 +2,9 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/EBIBioSamples/certification-pipeline/internal/model"
+	"github.com/xeipuuv/gojsonschema"
 	"io/ioutil"
 	"log"
 	"os"
@@ -14,15 +16,43 @@ type Config struct {
 	Plans      []model.Plan      `json:"plans"`
 }
 
-func NewConfig(logger *log.Logger, configFile string) *Config {
-	jsonFile, err := os.Open(configFile)
+type ConfigError struct {
+	message          string
+	validationErrors []string
+}
+
+func (ce ConfigError) Error() string {
+	return fmt.Sprintf("%s - %s", ce.message, ce.validationErrors)
+}
+
+func NewConfig(logger *log.Logger, configFilePath string, configSchemaFilePath string) (*Config, error) {
+	schemaFile, err := os.Open(configSchemaFilePath)
+	defer schemaFile.Close()
 	if err != nil {
 		logger.Panic(err)
 	}
-	defer jsonFile.Close()
+	configFile, err := os.Open(configFilePath)
+	defer configFile.Close()
+	if err != nil {
+		logger.Panic(err)
+	}
+	schemaBytes, _ := ioutil.ReadAll(schemaFile)
+	schemaLoader := gojsonschema.NewStringLoader(string(schemaBytes))
+	configBytes, _ := ioutil.ReadAll(configFile)
+	documentLoader := gojsonschema.NewStringLoader(string(configBytes))
+	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
+	if err != nil {
+		logger.Panic(err)
+	}
+	if !result.Valid() {
+		ce := ConfigError{message: "The config is not valid"}
+		for _, desc := range result.Errors() {
+			ce.validationErrors = append(ce.validationErrors, desc.Description())
+		}
+		return nil, ce
+	}
 	var config Config
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-	json.Unmarshal([]byte(byteValue), &config)
+	json.Unmarshal([]byte(configBytes), &config)
 	config.logger = logger
-	return &config
+	return &config, nil
 }

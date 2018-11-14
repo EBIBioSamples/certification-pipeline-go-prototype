@@ -13,16 +13,6 @@
   ],
   "plans": [
     {
-      "name": "biosamples",
-      "version": "0.0.1"
-    },
-    {
-      "name": "ncbi",
-      "version": "0.0.1"
-    }
-  ],
-  "plans": [
-    {
       "candidate_checklist_id": "ncbi-0.0.1",
       "certification_checklist_id": "biosamples-0.0.1",
       "curations": [

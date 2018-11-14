@@ -28,7 +28,7 @@ var (
 	sampleInterrogated = make(chan model.InterrogationResult)
 	planCompleted      = make(chan model.PlanResult)
 	certificateIssued  = make(chan model.Certificate)
-	c                  = config.NewConfig(logger, "./res/config.json")
+	c, _               = config.NewConfig(logger, "./res/config.json", "./res/schemas/config-schema.json")
 	cr                 = creator.NewCreator(logger, sampleCreated)
 	rep                *reporter.Reporter
 )
