@@ -20,4 +20,5 @@ func TestLoader(t *testing.T) {
 		assert.NotNil(t, c.Version)
 		assert.NotNil(t, c.File)
 	}
+	assert.NotEmpty(t, config.Plans)
 }

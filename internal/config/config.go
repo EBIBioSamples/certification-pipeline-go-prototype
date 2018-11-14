@@ -11,6 +11,7 @@ import (
 type Config struct {
 	logger     *log.Logger
 	Checklists []model.Checklist `json:"checklists"`
+	Plans      []model.Plan      `json:"plans"`
 }
 
 func NewConfig(logger *log.Logger, configFile string) *Config {

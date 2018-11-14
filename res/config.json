@@ -10,5 +10,15 @@
       "version": "0.0.1",
       "file": "./schemas/ncbi-candidate-schema.json"
     }
+  ],
+  "plans": [
+    {
+      "name": "biosamples",
+      "version": "0.0.1"
+    },
+    {
+      "name": "ncbi",
+      "version": "0.0.1"
+    }
   ]
 }

@@ -9,9 +9,9 @@ type ValidationResult struct {
 
 //Checklist contains the name and file of a checklist
 type Checklist struct {
-	Version string `"json:version"`
-	Name    string `"json:name"`
-	File    string `"json:file"`
+	Version string `json:"version"`
+	Name    string `json:"name"`
+	File    string `json:"file"`
 }
 
 //Sample tracks samples JSON in the pipeline
