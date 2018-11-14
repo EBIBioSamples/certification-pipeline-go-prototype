@@ -6,25 +6,25 @@ import (
 )
 
 type Curator struct {
-	logger                   *log.Logger
-	sampleInterrogated       chan model.InterrogationResult
-	curationPlanCompleted    chan model.PlanResult
-	certificateIssued        chan model.Certificate
-	curationPlansByChecklist map[model.Checklist]model.Plan
+	logger                      *log.Logger
+	sampleInterrogated          chan model.InterrogationResult
+	planCompleted               chan model.PlanResult
+	certificateIssued           chan model.Certificate
+	plansByCandidateChecklistID map[string]model.Plan
 }
 
 func NewCurator(logger *log.Logger, sampleInterrogated chan model.InterrogationResult,
-	curationPlanCompleted chan model.PlanResult, certificateIssued chan model.Certificate, curationPlans []model.Plan) *Curator {
-	curationPlansByChecklist := make(map[model.Checklist]model.Plan)
-	for _, cp := range curationPlans {
-		curationPlansByChecklist[cp.FromChecklist] = cp
+	planCompleted chan model.PlanResult, certificateIssued chan model.Certificate, plans []model.Plan) *Curator {
+	plansByCandidateChecklistID := make(map[string]model.Plan)
+	for _, p := range plans {
+		plansByCandidateChecklistID[p.CandidateChecklistID] = p
 	}
 	curator := Curator{
-		logger:                   logger,
-		sampleInterrogated:       sampleInterrogated,
-		curationPlanCompleted:    curationPlanCompleted,
-		certificateIssued:        certificateIssued,
-		curationPlansByChecklist: curationPlansByChecklist,
+		logger:                      logger,
+		sampleInterrogated:          sampleInterrogated,
+		planCompleted:               planCompleted,
+		certificateIssued:           certificateIssued,
+		plansByCandidateChecklistID: plansByCandidateChecklistID,
 	}
 	curator.handleEvents(sampleInterrogated)
 	return &curator
@@ -38,17 +38,17 @@ func (c *Curator) runCurationPlans(ir model.InterrogationResult) {
 }
 
 func (c *Curator) runCurationPlan(checklist model.Checklist, s model.Sample) {
-	if _, ok := c.curationPlansByChecklist[checklist]; !ok {
-		c.logger.Printf("no curation plans for %s", checklist.Name)
+	if _, ok := c.plansByCandidateChecklistID[checklist.ID()]; !ok {
+		c.logger.Printf("no curation plans for %s", checklist.ID())
 		return
 	}
-	cp := c.curationPlansByChecklist[checklist]
-	s = cp.Execute(s)
-	cpr := model.PlanResult{
+	p := c.plansByCandidateChecklistID[checklist.ID()]
+	s = p.Execute(s)
+	pr := model.PlanResult{
 		Sample: s,
-		Plan:   cp,
+		Plan:   p,
 	}
-	c.curationPlanCompleted <- cpr
+	c.planCompleted <- pr
 }
 
 func (c *Curator) handleEvents(sampleInterrogated chan model.InterrogationResult) {

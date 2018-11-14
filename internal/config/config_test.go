@@ -1,6 +1,8 @@
-package config
+package config_test
 
 import (
+	"fmt"
+	"github.com/EBIBioSamples/certification-pipeline/internal/config"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"os"
@@ -12,13 +14,19 @@ var (
 	configFile = "../../res/config.json"
 )
 
-func TestLoader(t *testing.T) {
-	config := NewConfig(logger, configFile)
+func TestConfig(t *testing.T) {
+	config := config.NewConfig(logger, configFile)
 	assert.NotEmpty(t, config.Checklists)
 	for _, c := range config.Checklists {
-		assert.NotNil(t, c.Name)
-		assert.NotNil(t, c.Version)
-		assert.NotNil(t, c.File)
+		assert.NotEmpty(t, c.Name)
+		assert.NotEmpty(t, c.Version)
+		assert.NotEmpty(t, c.File)
 	}
 	assert.NotEmpty(t, config.Plans)
+	for _, p := range config.Plans {
+		assert.NotEmpty(t, p.CandidateChecklistID)
+		assert.NotEmpty(t, p.CertificateChecklistID)
+		assert.NotEmpty(t, p.Curations)
+		fmt.Println(p.Curations)
+	}
 }

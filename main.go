@@ -29,7 +29,6 @@ var (
 	planCompleted      = make(chan model.PlanResult)
 	certificateIssued  = make(chan model.Certificate)
 	c                  = config.NewConfig(logger, "./res/config.json")
-	plans              []model.Plan
 	cr                 = creator.NewCreator(logger, sampleCreated)
 	rep                *reporter.Reporter
 )
@@ -72,20 +71,6 @@ func init() {
 	for _, checklist := range c.Checklists {
 		checklistMap[checklist.Name] = checklist
 	}
-	plans = []model.Plan{
-		{
-			Logger:        logger,
-			Name:          "NCBI to BioSamples",
-			FromChecklist: checklistMap["NCBI Candidate Checklist"],
-			ToChecklist:   checklistMap["BioSamples Checklist"],
-			Curations: []model.Curation{
-				{
-					Characteristic: "INSDC status",
-					NewValue:       "public",
-				},
-			},
-		},
-	}
 	interrogator.NewInterrogator(
 		logger,
 		&validator.Validator{},
@@ -98,7 +83,7 @@ func init() {
 		sampleInterrogated,
 		planCompleted,
 		certificateIssued,
-		plans,
+		c.Plans,
 	)
 	certifier.NewCertifier(
 		logger,

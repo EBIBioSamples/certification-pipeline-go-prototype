@@ -36,12 +36,10 @@ func TestPlan(t *testing.T) {
 		}
 
 		cp := model.Plan{
-			Logger: logger,
-			Name:   "Test curation plan",
 			Curations: []model.Curation{
 				{
 					Characteristic: "INSDC status",
-					NewValue:       "public",
+					Value:          "public",
 				},
 			},
 		}

@@ -1,5 +1,7 @@
 package model
 
+import "fmt"
+
 //ValidationResult contains the results of a validation
 type ValidationResult struct {
 	Valid   bool     `json:"valid"`
@@ -9,9 +11,13 @@ type ValidationResult struct {
 
 //Checklist contains the name and file of a checklist
 type Checklist struct {
-	Version string `json:"version"`
 	Name    string `json:"name"`
+	Version string `json:"version"`
 	File    string `json:"file"`
+}
+
+func (c *Checklist) ID() string {
+	return fmt.Sprintf("%s-%s", c.Name, c.Version)
 }
 
 //Sample tracks samples JSON in the pipeline
@@ -28,8 +34,8 @@ type InterrogationResult struct {
 
 //Curation is a transformation of a sample document content
 type Curation struct {
-	Characteristic string
-	NewValue       string
+	Characteristic string `json:"characteristic"`
+	Value          string `json:"value"`
 }
 
 //PlanResult is the result of executing a curation plan

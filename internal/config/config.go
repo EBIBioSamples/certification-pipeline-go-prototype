@@ -24,6 +24,5 @@ func NewConfig(logger *log.Logger, configFile string) *Config {
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	json.Unmarshal([]byte(byteValue), &config)
 	config.logger = logger
-
 	return &config
 }
