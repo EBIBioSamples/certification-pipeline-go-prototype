@@ -9,8 +9,9 @@ type ValidationResult struct {
 
 //Checklist contains the name and file of a checklist
 type Checklist struct {
-	Name string
-	File string
+	Version string `"json:version"`
+	Name    string `"json:name"`
+	File    string `"json:file"`
 }
 
 //Sample tracks samples JSON in the pipeline
@@ -31,10 +32,10 @@ type Curation struct {
 	NewValue       string
 }
 
-//CurationPlanResult is the result of executing a curation plan
-type CurationPlanResult struct {
-	CurationPlan Plan
-	Sample       Sample
+//PlanResult is the result of executing a curation plan
+type PlanResult struct {
+	Plan   Plan
+	Sample Sample
 }
 
 //Certificate is certification given to a Sample against a Checklist

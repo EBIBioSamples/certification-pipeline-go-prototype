@@ -15,7 +15,7 @@ import (
 var (
 	logger                = log.New(os.Stdout, "TestCurate ", log.LstdFlags|log.Lshortfile)
 	sampleInterrogated    = make(chan model.InterrogationResult)
-	curationPlanCompleted = make(chan model.CurationPlanResult)
+	curationPlanCompleted = make(chan model.PlanResult)
 	certificateIssued     = make(chan model.Certificate)
 	checklists            = []model.Checklist{
 		{Name: "NCBI Candidate Checklist", File: "../../res/schemas/ncbi-candidate-schema.json"},

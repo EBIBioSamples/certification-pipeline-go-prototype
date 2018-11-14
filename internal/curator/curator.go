@@ -8,13 +8,13 @@ import (
 type Curator struct {
 	logger                   *log.Logger
 	sampleInterrogated       chan model.InterrogationResult
-	curationPlanCompleted    chan model.CurationPlanResult
+	curationPlanCompleted    chan model.PlanResult
 	certificateIssued        chan model.Certificate
 	curationPlansByChecklist map[model.Checklist]model.Plan
 }
 
 func NewCurator(logger *log.Logger, sampleInterrogated chan model.InterrogationResult,
-	curationPlanCompleted chan model.CurationPlanResult, certificateIssued chan model.Certificate, curationPlans []model.Plan) *Curator {
+	curationPlanCompleted chan model.PlanResult, certificateIssued chan model.Certificate, curationPlans []model.Plan) *Curator {
 	curationPlansByChecklist := make(map[model.Checklist]model.Plan)
 	for _, cp := range curationPlans {
 		curationPlansByChecklist[cp.FromChecklist] = cp
@@ -44,9 +44,9 @@ func (c *Curator) runCurationPlan(checklist model.Checklist, s model.Sample) {
 	}
 	cp := c.curationPlansByChecklist[checklist]
 	s = cp.Execute(s)
-	cpr := model.CurationPlanResult{
-		Sample:       s,
-		CurationPlan: cp,
+	cpr := model.PlanResult{
+		Sample: s,
+		Plan:   cp,
 	}
 	c.curationPlanCompleted <- cpr
 }

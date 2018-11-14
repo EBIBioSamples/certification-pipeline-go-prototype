@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/EBIBioSamples/certification-pipeline/internal/certifier"
+	"github.com/EBIBioSamples/certification-pipeline/internal/config"
 	"github.com/EBIBioSamples/certification-pipeline/internal/creator"
 	"github.com/EBIBioSamples/certification-pipeline/internal/curator"
 	"github.com/EBIBioSamples/certification-pipeline/internal/interrogator"
@@ -20,20 +21,17 @@ import (
 )
 
 var (
-	logger                = log.New(os.Stdout, "Certification Pipeline ", log.LstdFlags|log.Lshortfile)
-	serverPort            = os.Getenv("SERVER_PORT")
-	graylogAddr           = os.Getenv("GRAYLOG_URL")
-	sampleCreated         = make(chan model.Sample)
-	sampleInterrogated    = make(chan model.InterrogationResult)
-	curationPlanCompleted = make(chan model.CurationPlanResult)
-	certificateIssued     = make(chan model.Certificate)
-	checklists            = []model.Checklist{
-		{Name: "NCBI Candidate Checklist", File: "./res/schemas/ncbi-candidate-schema.json"},
-		{Name: "BioSamples Checklist", File: "./res/schemas/biosamples-schema.json"},
-	}
-	curationPlans []model.Plan
-	cr            = creator.NewCreator(logger, sampleCreated)
-	rep           *reporter.Reporter
+	logger             = log.New(os.Stdout, "Certification Pipeline ", log.LstdFlags|log.Lshortfile)
+	serverPort         = os.Getenv("SERVER_PORT")
+	graylogAddr        = os.Getenv("GRAYLOG_URL")
+	sampleCreated      = make(chan model.Sample)
+	sampleInterrogated = make(chan model.InterrogationResult)
+	planCompleted      = make(chan model.PlanResult)
+	certificateIssued  = make(chan model.Certificate)
+	c                  = config.NewConfig(logger, "./res/config.json")
+	plans              []model.Plan
+	cr                 = creator.NewCreator(logger, sampleCreated)
+	rep                *reporter.Reporter
 )
 
 func interrogateHandler(w http.ResponseWriter, r *http.Request) {
@@ -71,10 +69,10 @@ func init() {
 	}
 
 	checklistMap := make(map[string]model.Checklist)
-	for _, checklist := range checklists {
+	for _, checklist := range c.Checklists {
 		checklistMap[checklist.Name] = checklist
 	}
-	curationPlans = []model.Plan{
+	plans = []model.Plan{
 		{
 			Logger:        logger,
 			Name:          "NCBI to BioSamples",
@@ -93,21 +91,21 @@ func init() {
 		&validator.Validator{},
 		sampleCreated,
 		sampleInterrogated,
-		checklists,
+		c.Checklists,
 	)
 	curator.NewCurator(
 		logger,
 		sampleInterrogated,
-		curationPlanCompleted,
+		planCompleted,
 		certificateIssued,
-		curationPlans,
+		plans,
 	)
 	certifier.NewCertifier(
 		logger,
 		&validator.Validator{},
-		curationPlanCompleted,
+		planCompleted,
 		certificateIssued,
-		checklists,
+		c.Checklists,
 	)
 	rep = reporter.NewReporter(
 		logger,

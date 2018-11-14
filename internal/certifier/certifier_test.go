@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	curationPlanCompleted = make(chan model.CurationPlanResult)
+	curationPlanCompleted = make(chan model.PlanResult)
 	certificateIssued     = make(chan model.Certificate)
 	checklists            = []model.Checklist{
 		{Name: "BioSamples Checklist", File: "../../res/schemas/biosamples-schema.json"},
@@ -44,7 +44,7 @@ func TestCertify(t *testing.T) {
 		)
 
 		sample := model.Sample{UUID: "test-uuid", Document: string(document)}
-		cpr := model.CurationPlanResult{
+		cpr := model.PlanResult{
 			Sample: sample,
 		}
 		curationPlanCompleted <- cpr

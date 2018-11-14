@@ -15,13 +15,13 @@ import (
 type Certifier struct {
 	logger                *log.Logger
 	validator             *validator.Validator
-	curationPlanCompleted chan model.CurationPlanResult
+	curationPlanCompleted chan model.PlanResult
 	certificateIssued     chan model.Certificate
 	checklists            []model.Checklist
 	hash                  hash.Hash
 }
 
-func (c *Certifier) certify(cpr model.CurationPlanResult) {
+func (c *Certifier) certify(cpr model.PlanResult) {
 	for _, checklist := range c.checklists {
 		c.logger.Printf("validating %s against %s\n", cpr.Sample.UUID, checklist.Name)
 		schema, err := ioutil.ReadFile(checklist.File)
@@ -50,7 +50,7 @@ func (c *Certifier) certify(cpr model.CurationPlanResult) {
 func NewCertifier(
 	logger *log.Logger,
 	validator *validator.Validator,
-	curationPlanCompleted chan model.CurationPlanResult,
+	curationPlanCompleted chan model.PlanResult,
 	certificateIssued chan model.Certificate,
 	checklists []model.Checklist) *Certifier {
 	c := Certifier{
@@ -65,7 +65,7 @@ func NewCertifier(
 	return &c
 }
 
-func (c *Certifier) handleEvents(curationPlanCompleted chan model.CurationPlanResult) {
+func (c *Certifier) handleEvents(curationPlanCompleted chan model.PlanResult) {
 	go func() {
 		for {
 			select {

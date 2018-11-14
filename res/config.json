@@ -1,0 +1,14 @@
+{
+  "checklists": [
+    {
+      "name": "biosamples",
+      "version": "0.0.1",
+      "file": "./schemas/biosamples-schema.json"
+    },
+    {
+      "name": "ncbi",
+      "version": "0.0.1",
+      "file": "./schemas/ncbi-candidate-schema.json"
+    }
+  ]
+}
