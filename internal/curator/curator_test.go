@@ -19,7 +19,7 @@ var (
 	planCompleted      = make(chan model.PlanResult)
 	certificateIssued  = make(chan model.Certificate)
 	checklistMap       = make(map[string]model.Checklist)
-	c                  = config.NewConfig(logger, "../../res/config.json")
+	c, _               = config.NewConfig(logger, "../../res/config.json", "../../res/schemas/config-schema.json")
 )
 
 func init() {
