@@ -13,6 +13,11 @@ type Reporter struct {
 	certMap map[string]model.Certificate
 }
 
+type Result struct {
+	Cert  model.Certificate
+	Badge string
+}
+
 func NewReporter(logger *log.Logger, certificateIssued chan model.Certificate) *Reporter {
 	r := Reporter{
 		logger:            logger,
@@ -37,9 +42,13 @@ func (r *Reporter) handleEvents(certificateIssued chan model.Certificate) {
 	}()
 }
 
-func (r *Reporter) SampleInfo(uuid string) (cert model.Certificate, ok bool) {
+func (r *Reporter) SampleInfo(uuid string) (result Result, ok bool) {
 	r.RLock()
-	result, ok := r.certMap[uuid]
+	cert, ok := r.certMap[uuid]
+	var res Result
+	if ok {
+		res = Result{Cert: cert, Badge: cert.Badge()}
+	}
 	r.RUnlock()
-	return result, ok
+	return res, ok
 }

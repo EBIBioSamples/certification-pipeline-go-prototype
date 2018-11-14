@@ -51,3 +51,7 @@ type Certificate struct {
 	Checklist     Checklist
 	ChecklistHash string
 }
+
+func (c *Certificate) Badge() string {
+	return fmt.Sprintf("https://img.shields.io/badge/%s_%s-%s-%s.svg", c.Checklist.Name, c.Checklist.Version, "valid", "green")
+}
