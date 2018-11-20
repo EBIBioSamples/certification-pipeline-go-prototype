@@ -14,17 +14,10 @@ import (
 
 var (
 	sampleCreated = make(chan model.Sample)
+	jsonSubmitted = make(chan string)
 )
 
 func TestCreateSample(t *testing.T) {
-	go func(sampleCreated chan model.Sample) {
-		for {
-			select {
-			case sample := <-sampleCreated:
-				fmt.Printf("sample created: %s\n", sample.UUID)
-			}
-		}
-	}(sampleCreated)
 	tests := []struct {
 		documentFile string
 	}{
@@ -38,10 +31,14 @@ func TestCreateSample(t *testing.T) {
 			log.Fatal(errors.Wrap(err, fmt.Sprintf("read failed for: %s", test.documentFile)))
 		}
 
-		c := creator.NewCreator(
+		creator.NewCreator(
 			log.New(os.Stdout, "TestCreateSample ", log.LstdFlags|log.Lshortfile),
+			jsonSubmitted,
 			sampleCreated)
-		sample := c.CreateSample(string(document))
+
+		jsonSubmitted <- string(document)
+		sample := <-sampleCreated
+
 		assert.Regexp(t, `[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`, sample.UUID)
 	}
 }
