@@ -14,13 +14,9 @@ import (
 )
 
 var (
-	logger            = log.New(os.Stdout, "TestCurate ", log.LstdFlags|log.Lshortfile)
-	checklistMatched  = make(chan model.ChecklistMatches)
-	planCompleted     = make(chan model.PlanResult)
-	curationCompleted = make(chan model.CurationEnd)
-	certificateIssued = make(chan model.Certificate)
-	checklistMap      = make(map[string]model.Checklist)
-	c, _              = config.NewConfig(logger, "../../res/config.json", "../../res/schemas/config-schema.json")
+	logger       = log.New(os.Stdout, "TestCurate ", log.LstdFlags|log.Lshortfile)
+	checklistMap = make(map[string]model.Checklist)
+	c, _         = config.NewConfig(logger, "../../res/config.json", "../../res/schemas/config-schema.json")
 )
 
 func init() {
@@ -40,6 +36,7 @@ func TestCurate(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
+		checklistMatched := make(chan model.ChecklistMatches)
 		planCompleted, _ := curator.NewCurator(
 			logger,
 			checklistMatched,
@@ -63,8 +60,8 @@ func TestCurate(t *testing.T) {
 	}
 }
 
-/*
 func TestCurateWithNoMatchingPlans(t *testing.T) {
+	checklistMatched := make(chan model.ChecklistMatches)
 	_, curationCompleted := curator.NewCurator(
 		logger,
 		checklistMatched,
@@ -78,4 +75,3 @@ func TestCurateWithNoMatchingPlans(t *testing.T) {
 	cc := <-curationCompleted
 	assert.Equal(t, "biosamples-0.0.1", cc.Checklist.ID())
 }
-*/
