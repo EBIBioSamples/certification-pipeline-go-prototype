@@ -27,6 +27,7 @@ type Pipeline struct {
 	sampleCreated      chan model.Sample
 	sampleInterrogated chan model.ChecklistMatches
 	planCompleted      chan model.PlanResult
+	curationCompeted   chan model.CurationEnd
 	certificateIssued  chan model.Certificate
 }
 
@@ -35,9 +36,9 @@ func NewPipeline(c *config.Config, in chan string) *Pipeline {
 		logger:             c.Logger,
 		sampleCreated:      creator.NewCreator(creatorIn),
 		sampleInterrogated: interrogator.NewInterrogator(c.Logger, interrogatorIn, c.Checklists),
-		planCompleted:      curator.NewCurator(c.Logger, curatorIn, c.Plans),
 		certificateIssued:  certifier.NewCertifier(c.Logger, certifierIn, c.Checklists),
 	}
+	p.planCompleted, p.curationCompeted = curator.NewCurator(c.Logger, curatorIn, c.Plans)
 	recorder.NewRecorder(c.Logger, recordSampleCreated, recordPlanCompleted, recordCertificateIssued)
 	p.handleEvents(in, p.sampleCreated, p.sampleInterrogated, p.planCompleted, p.certificateIssued)
 	return &p

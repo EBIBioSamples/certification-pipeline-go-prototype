@@ -26,14 +26,6 @@ type Sample struct {
 	Document string
 }
 
-/*
-//InterrogationResult contains the checklists sample is a candidate for
-type InterrogationResult struct {
-	Sample              Sample
-	CandidateChecklists []Checklist
-}
-*/
-
 //ChecklistMatched contains the checklists sample is matched against
 type ChecklistMatches struct {
 	Sample     Sample
@@ -48,8 +40,14 @@ type Curation struct {
 
 //PlanResult is the result of executing a curation plan
 type PlanResult struct {
-	Plan   Plan
 	Sample Sample
+	Plan   Plan
+}
+
+//CurationEnd is the end point of curation
+type CurationEnd struct {
+	Sample    Sample
+	Checklist Checklist
 }
 
 //Certificate is certification given to a Sample against a Checklist

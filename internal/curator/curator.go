@@ -9,11 +9,12 @@ type Curator struct {
 	logger                      *log.Logger
 	checklistMatched            chan model.ChecklistMatches
 	planCompleted               chan model.PlanResult
+	curationCompleted           chan model.CurationEnd
 	certificateIssued           chan model.Certificate
 	plansByCandidateChecklistID map[string]model.Plan
 }
 
-func NewCurator(logger *log.Logger, checklistMatched chan model.ChecklistMatches, plans []model.Plan) chan model.PlanResult {
+func NewCurator(logger *log.Logger, checklistMatched chan model.ChecklistMatches, plans []model.Plan) (planCompleted chan model.PlanResult, curationCompleted chan model.CurationEnd) {
 	plansByCandidateChecklistID := make(map[string]model.Plan)
 	for _, p := range plans {
 		plansByCandidateChecklistID[p.CandidateChecklistID] = p
@@ -22,10 +23,11 @@ func NewCurator(logger *log.Logger, checklistMatched chan model.ChecklistMatches
 		logger:                      logger,
 		checklistMatched:            checklistMatched,
 		planCompleted:               make(chan model.PlanResult),
+		curationCompleted:           make(chan model.CurationEnd),
 		plansByCandidateChecklistID: plansByCandidateChecklistID,
 	}
 	c.handleEvents(checklistMatched)
-	return c.planCompleted
+	return c.planCompleted, c.curationCompleted
 }
 
 func (c *Curator) runCurationPlans(ir model.ChecklistMatches) {
@@ -37,15 +39,16 @@ func (c *Curator) runCurationPlans(ir model.ChecklistMatches) {
 
 func (c *Curator) runCurationPlan(checklist model.Checklist, s model.Sample) {
 	if _, ok := c.plansByCandidateChecklistID[checklist.ID()]; !ok {
-		return
+		c.curationCompleted <- model.CurationEnd{Sample: s, Checklist: checklist}
+	} else {
+		p := c.plansByCandidateChecklistID[checklist.ID()]
+		s = p.Execute(s)
+		pr := model.PlanResult{
+			Sample: s,
+			Plan:   p,
+		}
+		c.planCompleted <- pr
 	}
-	p := c.plansByCandidateChecklistID[checklist.ID()]
-	s = p.Execute(s)
-	pr := model.PlanResult{
-		Sample: s,
-		Plan:   p,
-	}
-	c.planCompleted <- pr
 }
 
 func (c *Curator) handleEvents(in chan model.ChecklistMatches) {
@@ -54,8 +57,6 @@ func (c *Curator) handleEvents(in chan model.ChecklistMatches) {
 			select {
 			case ir := <-in:
 				c.runCurationPlans(ir)
-			case cert := <-c.certificateIssued:
-				c.runCurationPlan(cert.Checklist, cert.Sample)
 			}
 		}
 	}()
