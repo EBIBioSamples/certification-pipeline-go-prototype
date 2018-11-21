@@ -1,7 +1,6 @@
 package recorder
 
 import (
-	"fmt"
 	"github.com/EBIBioSamples/certification-pipeline/internal/model"
 )
 
@@ -30,5 +29,5 @@ func (r *Recorder) handleEvents(sampleCreated chan model.Sample) {
 }
 
 func (r *Recorder) onSampleCreated(sample model.Sample) {
-	fmt.Printf("create sample: %s", sample.Document)
+	//fmt.Printf("create sample: %s\n", sample.Document)
 }

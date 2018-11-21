@@ -62,12 +62,13 @@ func (p *Pipeline) handleEvents(
 }
 
 func (p *Pipeline) onIn(input string) {
-	p.logger.Printf("\nInput\t\t\t\t| len:%v", len(input))
+	p.logger.Println()
+	p.logger.Printf("Input\t\t\t\t | len:%v", len(input))
 	creatorIn <- input
 }
 
 func (p *Pipeline) onSampleCreated(sample model.Sample) {
-	p.logger.Printf("Sample Created\t\t| sample:%s", sample.UUID)
+	p.logger.Printf("Sample Created\t\t | sample:%s", sample.UUID)
 	interrogatorIn <- sample
 	recordSampleCreated <- sample
 }
@@ -77,17 +78,17 @@ func (p *Pipeline) onSampleInterrogated(cm model.ChecklistMatches) {
 	for _, c := range cm.Checklists {
 		ids = append(ids, c.ID())
 	}
-	p.logger.Printf("Sample Interrograted\t| sample:%s matched:%s", cm.Sample.UUID, strings.Join(ids, ", "))
+	p.logger.Printf("Sample Interrograted | sample:%s matched:%s", cm.Sample.UUID, strings.Join(ids, ", "))
 	curatorIn <- cm
 }
 
 func (p *Pipeline) onPlanCompleted(pr model.PlanResult) {
-	p.logger.Printf("Plan Completed\t\t| sample:%s plan:%s ", pr.Sample.UUID, pr.Plan.Describe())
+	p.logger.Printf("Plan Completed\t\t | sample:%s plan:%s ", pr.Sample.UUID, pr.Plan.Describe())
 	certifierIn <- pr
 }
 
 func (p *Pipeline) onCertificateIssued(c model.Certificate) {
-	p.logger.Printf("Certificate Issued\t| sample:%s certificate:%s", c.Sample.UUID, c.Checklist.ID())
+	p.logger.Printf("Certificate Issued\t | sample:%s certificate:%s", c.Sample.UUID, c.Checklist.ID())
 	cm := model.ChecklistMatches{
 		Sample:     c.Sample,
 		Checklists: []model.Checklist{c.Checklist},

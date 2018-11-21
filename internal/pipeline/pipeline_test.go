@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"testing"
+	"time"
 )
 
 var (
@@ -36,11 +37,13 @@ func TestPipeline(t *testing.T) {
 			logger.Fatal(errors.Wrap(err, fmt.Sprintf("failed to create config")))
 		}
 
-		pipeline.NewPipeline(
-			c,
-			jsonSubmitted,
-		)
+		pipeline.NewPipeline(c, jsonSubmitted)
 
 		jsonSubmitted <- string(document)
 	}
+	select {
+	case <-time.After(1 * time.Second):
+		fmt.Println("Quitting after timeout")
+	}
+
 }
