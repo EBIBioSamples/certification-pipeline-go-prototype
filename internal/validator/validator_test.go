@@ -44,8 +44,6 @@ func TestValidate(t *testing.T) {
 			log.Fatal(errors.Wrap(err, fmt.Sprintf("read failed for: %s", test.schemaFile)))
 		}
 
-		validator := validator.Validator{}
-
 		vr, err := validator.Validate(string(schema), string(document))
 
 		assert.Equal(t, test.valid, vr.Valid)

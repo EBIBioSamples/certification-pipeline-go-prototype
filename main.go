@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/EBIBioSamples/certification-pipeline/internal/config"
 	"github.com/EBIBioSamples/certification-pipeline/internal/model"
-	"github.com/EBIBioSamples/certification-pipeline/internal/orchestrator"
+	"github.com/EBIBioSamples/certification-pipeline/internal/pipeline"
 	"github.com/EBIBioSamples/certification-pipeline/internal/reporter"
 	"github.com/gorilla/mux"
 	"gopkg.in/Graylog2/go-gelf.v1/gelf"
@@ -22,7 +22,6 @@ var (
 	graylogAddr   = os.Getenv("GRAYLOG_URL")
 	c, _          = config.NewConfig(logger, "./res/config.json", "./res/schemas/config-schema.json")
 	jsonSubmitted = make(chan string)
-	o             = orchestrator.NewOrchestrator(logger, c, jsonSubmitted)
 	rep           *reporter.Reporter
 )
 
@@ -31,6 +30,7 @@ func interrogateHandler(w http.ResponseWriter, r *http.Request) {
 	buf.ReadFrom(r.Body)
 	jsonSubmitted <- buf.String()
 	w.Header().Set("content-type", "application/json")
+	w.WriteHeader(http.StatusCreated)
 	//json.NewEncoder(w).Encode(fmt.Sprintf("http://%s/sample/%s", r.Host, sample.UUID))
 }
 
@@ -68,7 +68,9 @@ func init() {
 }
 
 func main() {
-	logger.Printf("starting curation pipeline service")
+	logger.Printf("creating certification pipeline")
+	pipeline.NewPipeline(c, jsonSubmitted)
+	logger.Printf("starting service")
 	r := mux.NewRouter()
 	r.Handle("/", http.FileServer(http.Dir("./static")))
 	r.HandleFunc("/interrogate", interrogateHandler).Methods("POST")

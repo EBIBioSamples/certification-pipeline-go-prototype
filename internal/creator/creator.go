@@ -3,13 +3,10 @@ package creator
 import (
 	"github.com/EBIBioSamples/certification-pipeline/internal/model"
 	"github.com/google/uuid"
-	"log"
 )
 
 //Creator registers a samples document with the system to enable tracking
 type Creator struct {
-	logger        *log.Logger
-	jsonSubmitted chan string
 	sampleCreated chan model.Sample
 }
 
@@ -19,27 +16,24 @@ func (c *Creator) createSample(json string) {
 		UUID:     uuid.Must(uuid.NewUUID()).String(),
 		Document: json,
 	}
-	c.logger.Printf("created new sample: %s", sample.UUID)
 	c.sampleCreated <- sample
 }
 
 //NewCreator returns a new instance of a creator with an output channel
-func NewCreator(logger *log.Logger, jsonSubmitted chan string, sampleCreated chan model.Sample) *Creator {
+func NewCreator(in chan string) chan model.Sample {
 	c := Creator{
-		logger:        logger,
-		jsonSubmitted: jsonSubmitted,
-		sampleCreated: sampleCreated,
+		sampleCreated: make(chan model.Sample),
 	}
-	c.handleEvents(jsonSubmitted)
-	return &c
+	c.handleEvents(in)
+	return c.sampleCreated
 }
 
-func (c *Creator) handleEvents(jsonSubmitted chan string) {
+func (c *Creator) handleEvents(in chan string) {
 	go func() {
 		for {
 			select {
-			case j := <-jsonSubmitted:
-				c.createSample(j)
+			case input := <-in:
+				c.createSample(input)
 			}
 		}
 	}()

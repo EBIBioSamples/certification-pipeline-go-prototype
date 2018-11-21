@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/EBIBioSamples/certification-pipeline/internal/interrogator"
 	"github.com/EBIBioSamples/certification-pipeline/internal/model"
-	"github.com/EBIBioSamples/certification-pipeline/internal/validator"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
@@ -14,9 +13,9 @@ import (
 )
 
 var (
-	sampleCreated      = make(chan model.Sample)
-	sampleInterrogated = make(chan model.InterrogationResult)
-	checklists         = []model.Checklist{
+	logger     = log.New(os.Stdout, "TestInterrogate ", log.LstdFlags|log.Lshortfile)
+	in         = make(chan model.Sample)
+	checklists = []model.Checklist{
 		{Name: "NCBI Candidate Checklist", File: "../../res/schemas/ncbi-candidate-schema.json"},
 		{Name: "BioSamples Checklist", File: "../../res/schemas/biosamples-schema.json"},
 	}
@@ -38,19 +37,15 @@ func TestInterrogate(t *testing.T) {
 			log.Fatal(errors.Wrap(err, fmt.Sprintf("read failed for: %s", test.documentFile)))
 		}
 
-		interrogator.NewInterrogator(
-			log.New(os.Stdout, "TestInterrogate ", log.LstdFlags|log.Lshortfile),
-			&validator.Validator{},
-			sampleCreated,
-			sampleInterrogated,
-			checklists,
-		)
+		sampleInterrogated := interrogator.NewInterrogator(logger, in, checklists)
 
 		sample := model.Sample{UUID: "test-uuid", Document: string(document)}
-		sampleCreated <- sample
+
+		in <- sample
 		ir := <-sampleInterrogated
+
 		var candidateNames []string
-		for _, checklist := range ir.CandidateChecklists {
+		for _, checklist := range ir.Checklists {
 			candidateNames = append(candidateNames, checklist.Name)
 		}
 		assert.Equal(t, test.expectedCandidateNames, candidateNames)

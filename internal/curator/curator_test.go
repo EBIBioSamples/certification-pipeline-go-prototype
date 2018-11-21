@@ -14,12 +14,12 @@ import (
 )
 
 var (
-	logger             = log.New(os.Stdout, "TestCurate ", log.LstdFlags|log.Lshortfile)
-	sampleInterrogated = make(chan model.InterrogationResult)
-	planCompleted      = make(chan model.PlanResult)
-	certificateIssued  = make(chan model.Certificate)
-	checklistMap       = make(map[string]model.Checklist)
-	c, _               = config.NewConfig(logger, "../../res/config.json", "../../res/schemas/config-schema.json")
+	logger            = log.New(os.Stdout, "TestCurate ", log.LstdFlags|log.Lshortfile)
+	checklistMatched  = make(chan model.ChecklistMatches)
+	planCompleted     = make(chan model.PlanResult)
+	certificateIssued = make(chan model.Certificate)
+	checklistMap      = make(map[string]model.Checklist)
+	c, _              = config.NewConfig(logger, "../../res/config.json", "../../res/schemas/config-schema.json")
 )
 
 func init() {
@@ -39,11 +39,9 @@ func TestCurate(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		curator.NewCurator(
+		planCompleted := curator.NewCurator(
 			logger,
-			sampleInterrogated,
-			planCompleted,
-			certificateIssued,
+			checklistMatched,
 			c.Plans,
 		)
 		document, err := ioutil.ReadFile(test.documentFile)
@@ -51,9 +49,9 @@ func TestCurate(t *testing.T) {
 			log.Fatal(errors.Wrap(err, fmt.Sprintf("read failed for: %s", test.documentFile)))
 		}
 		sample := model.Sample{UUID: "test-uuid", Document: string(document)}
-		sampleInterrogated <- model.InterrogationResult{
-			Sample:              sample,
-			CandidateChecklists: []model.Checklist{checklistMap["ncbi-0.0.1"]},
+		checklistMatched <- model.ChecklistMatches{
+			Sample:     sample,
+			Checklists: []model.Checklist{checklistMap["ncbi-0.0.1"]},
 		}
 		pr := <-planCompleted
 		curatedDocument, err := ioutil.ReadFile(test.curatedDocumentFile)

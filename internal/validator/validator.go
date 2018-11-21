@@ -5,12 +5,8 @@ import (
 	"github.com/xeipuuv/gojsonschema"
 )
 
-//Validator is used to validate documents against schemas
-type Validator struct {
-}
-
 //Validate a given document against a given schema
-func (v *Validator) Validate(schema string, document string) (model.ValidationResult, error) {
+func Validate(schema string, document string) (model.ValidationResult, error) {
 	schemaLoader := gojsonschema.NewStringLoader(schema)
 	documentLoader := gojsonschema.NewStringLoader(document)
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)

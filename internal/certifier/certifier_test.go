@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/EBIBioSamples/certification-pipeline/internal/certifier"
 	"github.com/EBIBioSamples/certification-pipeline/internal/model"
-	"github.com/EBIBioSamples/certification-pipeline/internal/validator"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
@@ -35,11 +34,9 @@ func TestCertify(t *testing.T) {
 			log.Fatal(errors.Wrap(err, fmt.Sprintf("read failed for: %s", test.documentFile)))
 		}
 
-		certifier.NewCertifier(
+		certificateIssued := certifier.NewCertifier(
 			log.New(os.Stdout, "TestInterrogate ", log.LstdFlags|log.Lshortfile),
-			&validator.Validator{},
 			curationPlanCompleted,
-			certificateIssued,
 			checklists,
 		)
 

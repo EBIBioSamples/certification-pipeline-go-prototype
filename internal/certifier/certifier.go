@@ -13,22 +13,19 @@ import (
 
 //Certifier validates a sample against a checklists and issues a certificate if successful
 type Certifier struct {
-	logger                *log.Logger
-	validator             *validator.Validator
-	curationPlanCompleted chan model.PlanResult
-	certificateIssued     chan model.Certificate
-	checklists            []model.Checklist
-	hash                  hash.Hash
+	logger            *log.Logger
+	certificateIssued chan model.Certificate
+	checklists        []model.Checklist
+	hash              hash.Hash
 }
 
 func (c *Certifier) certify(cpr model.PlanResult) {
 	for _, checklist := range c.checklists {
-		c.logger.Printf("validating %s against %s\n", cpr.Sample.UUID, checklist.Name)
 		schema, err := ioutil.ReadFile(checklist.File)
 		if err != nil {
 			c.logger.Panic(errors.Wrap(err, fmt.Sprintf("read failed for: %s", checklist)))
 		}
-		vr, err := c.validator.Validate(string(schema), cpr.Sample.Document)
+		vr, err := validator.Validate(string(schema), cpr.Sample.Document)
 		if err != nil {
 			c.logger.Panic(errors.Wrap(err, fmt.Sprintf("failed to validate")))
 		}
@@ -40,36 +37,28 @@ func (c *Certifier) certify(cpr model.PlanResult) {
 				Checklist:     checklist,
 				ChecklistHash: fmt.Sprintf("%x", md5.Sum(schema)),
 			}
-			c.logger.Printf("certificate for %s issued for sample: %s", checklist.Name, cpr.Sample.UUID)
 			c.certificateIssued <- cert
 		}
 	}
 }
 
 //NewCertifier returns a new instance of an Certifier with the specified checklists
-func NewCertifier(
-	logger *log.Logger,
-	validator *validator.Validator,
-	curationPlanCompleted chan model.PlanResult,
-	certificateIssued chan model.Certificate,
-	checklists []model.Checklist) *Certifier {
+func NewCertifier(logger *log.Logger, in chan model.PlanResult, checklists []model.Checklist) chan model.Certificate {
 	c := Certifier{
-		logger:                logger,
-		validator:             validator,
-		curationPlanCompleted: curationPlanCompleted,
-		certificateIssued:     certificateIssued,
-		checklists:            checklists,
-		hash:                  md5.New(),
+		logger:            logger,
+		certificateIssued: make(chan model.Certificate),
+		checklists:        checklists,
+		hash:              md5.New(),
 	}
-	c.handleEvents(curationPlanCompleted)
-	return &c
+	c.handleEvents(in)
+	return c.certificateIssued
 }
 
-func (c *Certifier) handleEvents(curationPlanCompleted chan model.PlanResult) {
+func (c *Certifier) handleEvents(in chan model.PlanResult) {
 	go func() {
 		for {
 			select {
-			case cpr := <-curationPlanCompleted:
+			case cpr := <-in:
 				c.certify(cpr)
 			}
 		}

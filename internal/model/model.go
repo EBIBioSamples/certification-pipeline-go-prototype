@@ -26,10 +26,18 @@ type Sample struct {
 	Document string
 }
 
+/*
 //InterrogationResult contains the checklists sample is a candidate for
 type InterrogationResult struct {
 	Sample              Sample
 	CandidateChecklists []Checklist
+}
+*/
+
+//ChecklistMatched contains the checklists sample is matched against
+type ChecklistMatches struct {
+	Sample     Sample
+	Checklists []Checklist
 }
 
 //Curation is a transformation of a sample document content

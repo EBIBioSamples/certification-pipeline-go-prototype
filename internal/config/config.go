@@ -11,7 +11,7 @@ import (
 )
 
 type Config struct {
-	logger     *log.Logger
+	Logger     *log.Logger
 	Checklists []model.Checklist `json:"checklists"`
 	Plans      []model.Plan      `json:"plans"`
 }
@@ -53,6 +53,6 @@ func NewConfig(logger *log.Logger, configFilePath string, configSchemaFilePath s
 	}
 	var config Config
 	json.Unmarshal([]byte(configBytes), &config)
-	config.logger = logger
+	config.Logger = logger
 	return &config, nil
 }
