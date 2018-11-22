@@ -1,8 +1,8 @@
-package creator_test
+package identifier_test
 
 import (
 	"fmt"
-	"github.com/EBIBioSamples/certification-pipeline/internal/creator"
+	"github.com/EBIBioSamples/certification-pipeline/internal/identifier"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
@@ -28,11 +28,11 @@ func TestCreateSample(t *testing.T) {
 			log.Fatal(errors.Wrap(err, fmt.Sprintf("read failed for: %s", test.documentFile)))
 		}
 
-		sampleCreated := creator.NewCreator(in)
+		sampleIdentified := identifier.NewIdentifier(in)
 
 		in <- string(document)
-		sample := <-sampleCreated
+		sample := <-sampleIdentified
 
-		assert.Regexp(t, `[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`, sample.UUID)
+		assert.Regexp(t, `SAM[END][AG]?[0-9]+`, sample.Accession)
 	}
 }

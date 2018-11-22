@@ -44,7 +44,7 @@ func TestPlan(t *testing.T) {
 			},
 		}
 
-		sample := model.Sample{UUID: "test-uuid", Document: string(document)}
+		sample := model.Sample{Accession: "test-uuid", Document: string(document)}
 		curatedSample := cp.Execute(sample)
 		assert.NotEqual(t, sample.Document, curatedSample.Document)
 		assert.Equal(t, string(curatedDocument), curatedSample.Document)

@@ -22,8 +22,8 @@ func (c *Checklist) ID() string {
 
 //Sample tracks samples JSON in the pipeline
 type Sample struct {
-	UUID     string
-	Document string
+	Accession string
+	Document  string
 }
 
 //ChecklistMatched contains the checklists sample is matched against

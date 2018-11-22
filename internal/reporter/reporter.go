@@ -34,9 +34,9 @@ func (r *Reporter) handleEvents(certificateIssued chan model.Certificate) {
 			select {
 			case cert := <-certificateIssued:
 				r.Lock()
-				r.certMap[cert.Sample.UUID] = cert
+				r.certMap[cert.Sample.Accession] = cert
 				r.Unlock()
-				r.logger.Printf("recorded %s certificate for %s", cert.Checklist.Name, cert.Sample.UUID)
+				r.logger.Printf("recorded %s certificate for %s", cert.Checklist.Name, cert.Sample.Accession)
 			}
 		}
 	}()

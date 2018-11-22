@@ -40,7 +40,7 @@ func TestCertify(t *testing.T) {
 			checklists,
 		)
 
-		sample := model.Sample{UUID: "test-uuid", Document: string(document)}
+		sample := model.Sample{Accession: "test-uuid", Document: string(document)}
 		cpr := model.PlanResult{
 			Sample: sample,
 		}

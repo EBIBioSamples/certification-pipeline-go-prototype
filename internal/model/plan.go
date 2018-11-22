@@ -22,8 +22,8 @@ func (p *Plan) Execute(s Sample) Sample {
 func (p *Plan) applyCuration(sample Sample, curation Curation) Sample {
 	curatedDocument, _ := sjson.Set(sample.Document, fmt.Sprintf("characteristics.%s.0.text", curation.Characteristic), curation.Value)
 	return Sample{
-		UUID:     sample.UUID,
-		Document: string(curatedDocument),
+		Accession: sample.Accession,
+		Document:  string(curatedDocument),
 	}
 }
 

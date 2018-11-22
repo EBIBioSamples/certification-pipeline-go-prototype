@@ -43,7 +43,7 @@ func TestInterrogate(t *testing.T) {
 
 		sampleInterrogated := interrogator.NewInterrogator(logger, in, checklists)
 
-		sample := model.Sample{UUID: "test-uuid", Document: string(document)}
+		sample := model.Sample{Accession: "test-uuid", Document: string(document)}
 
 		in <- sample
 		ir := <-sampleInterrogated

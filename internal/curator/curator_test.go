@@ -46,7 +46,7 @@ func TestCurate(t *testing.T) {
 		if err != nil {
 			log.Fatal(errors.Wrap(err, fmt.Sprintf("read failed for: %s", test.documentFile)))
 		}
-		sample := model.Sample{UUID: "test-uuid", Document: string(document)}
+		sample := model.Sample{Accession: "test-uuid", Document: string(document)}
 		checklistMatched <- model.ChecklistMatches{
 			Sample:     sample,
 			Checklists: []model.Checklist{checklistMap["ncbi-0.0.1"]},
@@ -67,7 +67,7 @@ func TestCurateWithNoMatchingPlans(t *testing.T) {
 		checklistMatched,
 		c.Plans,
 	)
-	sample := model.Sample{UUID: "test-uuid", Document: "{}"}
+	sample := model.Sample{Accession: "test-uuid", Document: "{}"}
 	checklistMatched <- model.ChecklistMatches{
 		Sample:     sample,
 		Checklists: []model.Checklist{checklistMap["biosamples-0.0.1"]},
