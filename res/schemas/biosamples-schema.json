@@ -22,6 +22,7 @@
         "INSDC status"
       ],
       "properties": {
+        "additionalProperties": true,
         "INSDC status": {
           "type": "array",
           "items": {
