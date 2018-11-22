@@ -2,6 +2,7 @@ module github.com/EBIBioSamples/certification-pipeline
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/go-bindata/go-bindata v1.0.0 // indirect
 	github.com/google/uuid v1.0.0
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/mux v1.6.2
