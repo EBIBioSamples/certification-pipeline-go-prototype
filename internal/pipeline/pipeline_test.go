@@ -9,22 +9,21 @@ import (
 	"log"
 	"os"
 	"testing"
-	"time"
-)
-
-var (
-	jsonSubmitted = make(chan string)
 )
 
 func TestPipeline(t *testing.T) {
 	tests := []struct {
 		documentFile string
 	}{
-		{
+		/*{
 			documentFile: "../../res/json/ncbi-SAMN03894263.json",
+		},*/
+		{
+			documentFile: "../../res/json/SAMEA3774859.json",
 		},
 	}
 	for _, test := range tests {
+		jsonSubmitted := make(chan string)
 		logger := log.New(os.Stdout, "TestPipeline", log.LstdFlags|log.Lshortfile)
 
 		document, err := ioutil.ReadFile(test.documentFile)
@@ -37,13 +36,10 @@ func TestPipeline(t *testing.T) {
 			logger.Fatal(errors.Wrap(err, fmt.Sprintf("failed to create config")))
 		}
 
-		pipeline.NewPipeline(c, jsonSubmitted)
+		piplineFinished := pipeline.NewPipeline(c, jsonSubmitted)
 
 		jsonSubmitted <- string(document)
-	}
-	select {
-	case <-time.After(1 * time.Second):
-		fmt.Println("Quitting after timeout")
+		<-piplineFinished
 	}
 
 }

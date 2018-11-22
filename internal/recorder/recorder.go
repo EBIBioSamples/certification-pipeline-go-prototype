@@ -1,7 +1,9 @@
 package recorder
 
 import (
+	"fmt"
 	"github.com/EBIBioSamples/certification-pipeline/internal/model"
+	"io/ioutil"
 	"log"
 )
 
@@ -37,13 +39,17 @@ func (r *Recorder) handleEvents(
 }
 
 func (r *Recorder) onSampleCreated(sample model.Sample) {
-	r.logger.Printf("Recorded Sample Created\t\t | sample:%s", sample.UUID)
+	r.logger.Printf("Recorded Sample Created\t | sample:%s", sample.UUID)
 }
 
 func (r *Recorder) onPlanCompleted(pr model.PlanResult) {
-	r.logger.Printf("Recorded Plan Completed\t\t | sample:%s plan:%s ", pr.Sample.UUID, pr.Plan.Describe())
+	r.logger.Printf("Recorded Plan Completed\t | sample:%s plan:%s ", pr.Sample.UUID, pr.Plan.Describe())
 }
 
 func (r *Recorder) onCertificateIssued(c model.Certificate) {
 	r.logger.Printf("Recorded Certificate Issued\t | sample:%s certificate:%s", c.Sample.UUID, c.Checklist.ID())
+	err := ioutil.WriteFile(fmt.Sprintf("%s-%s.json", c.Sample.UUID, c.Checklist.ID()), []byte(c.Sample.Document), 0644)
+	if err != nil {
+		r.logger.Printf("Error writing file: %s", err.Error())
+	}
 }

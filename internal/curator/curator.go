@@ -32,6 +32,9 @@ func NewCurator(logger *log.Logger, checklistMatched chan model.ChecklistMatches
 
 func (c *Curator) runCurationPlans(ir model.ChecklistMatches) {
 	s := ir.Sample
+	if len(ir.Checklists) == 0 {
+		c.curationCompleted <- model.CurationEnd{Sample: s}
+	}
 	for _, cc := range ir.Checklists {
 		c.runCurationPlan(cc, s)
 	}

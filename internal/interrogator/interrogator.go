@@ -18,7 +18,7 @@ type Interrogator struct {
 
 //Interrogate a given sample to find out which checklists it complies to
 func (i *Interrogator) interrogate(sample model.Sample) {
-	var candidates = make([]model.Checklist, 0)
+	candidates := make([]model.Checklist, 0)
 	for _, checklist := range i.checklistMap {
 		schema, err := ioutil.ReadFile(checklist.File)
 		if err != nil {
@@ -32,13 +32,11 @@ func (i *Interrogator) interrogate(sample model.Sample) {
 			candidates = append(candidates, checklist)
 		}
 	}
-	if len(candidates) > 0 {
-		ir := model.ChecklistMatches{
-			Sample:     sample,
-			Checklists: candidates,
-		}
-		i.sampleInterrogated <- ir
+	cm := model.ChecklistMatches{
+		Sample:     sample,
+		Checklists: candidates,
 	}
+	i.sampleInterrogated <- cm
 }
 
 //NewInterrogator returns a new instance of an Interrogate with the specified checklists

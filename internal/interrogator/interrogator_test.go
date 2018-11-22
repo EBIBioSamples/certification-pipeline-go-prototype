@@ -14,7 +14,6 @@ import (
 
 var (
 	logger     = log.New(os.Stdout, "TestInterrogate ", log.LstdFlags|log.Lshortfile)
-	in         = make(chan model.Sample)
 	checklists = []model.Checklist{
 		{Name: "NCBI Candidate Checklist", File: "../../res/schemas/ncbi-candidate-schema.json"},
 		{Name: "BioSamples Checklist", File: "../../res/schemas/biosamples-schema.json"},
@@ -30,8 +29,13 @@ func TestInterrogate(t *testing.T) {
 			documentFile:           "../../res/json/ncbi-SAMN03894263.json",
 			expectedCandidateNames: []string{"NCBI Candidate Checklist"},
 		},
+		{
+			documentFile:           "../../res/json/SAMEA3774859.json",
+			expectedCandidateNames: []string{},
+		},
 	}
 	for _, test := range tests {
+		in := make(chan model.Sample)
 		document, err := ioutil.ReadFile(test.documentFile)
 		if err != nil {
 			log.Fatal(errors.Wrap(err, fmt.Sprintf("read failed for: %s", test.documentFile)))
@@ -44,7 +48,7 @@ func TestInterrogate(t *testing.T) {
 		in <- sample
 		ir := <-sampleInterrogated
 
-		var candidateNames []string
+		candidateNames := make([]string, 0)
 		for _, checklist := range ir.Checklists {
 			candidateNames = append(candidateNames, checklist.Name)
 		}

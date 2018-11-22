@@ -26,13 +26,13 @@ func (ce ConfigError) Error() string {
 }
 
 func NewConfig(logger *log.Logger, configFilePath string, configSchemaFilePath string) (*Config, error) {
-	schemaFile, err := os.Open(configSchemaFilePath)
-	defer schemaFile.Close()
+	configFile, err := os.Open(configFilePath)
+	defer configFile.Close()
 	if err != nil {
 		logger.Panic(err)
 	}
-	configFile, err := os.Open(configFilePath)
-	defer configFile.Close()
+	schemaFile, err := os.Open(configSchemaFilePath)
+	defer schemaFile.Close()
 	if err != nil {
 		logger.Panic(err)
 	}
