@@ -31,8 +31,7 @@ func interrogateHandler(w http.ResponseWriter, r *http.Request) {
 	buf.ReadFrom(r.Body)
 	jsonSubmitted <- buf.String()
 	w.Header().Set("content-type", "application/json")
-	w.WriteHeader(http.StatusIdentified)
-	//json.NewEncoder(w).Encode(fmt.Sprintf("http://%s/sample/%s", r.Host, sample.Accession))
+	w.WriteHeader(http.StatusCreated)
 }
 
 func sampleHandler(w http.ResponseWriter, r *http.Request) {
