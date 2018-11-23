@@ -8,6 +8,8 @@
 
 An experimental project for the automatic curation, validation and certification of BioSamples.
 
+![Certification Pipeline Flow](images/cert-pipeline.png?raw=true "Certification Pipeline Flow")
+
 [1]: https://godoc.org/github.com/EBIBioSamples/certification-pipeline?status.svg
 [2]: https://godoc.org/github.com/EBIBioSamples/certification-pipeline
 [3]: https://goreportcard.com/badge/github.com/EBIBioSamples/certification-pipeline
