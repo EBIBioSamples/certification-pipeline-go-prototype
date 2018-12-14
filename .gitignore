@@ -112,3 +112,4 @@ fabric.properties
 /bscurate
 /internal/pipeline/*.json
 /*.json
+/dist/
